@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>For Author AI</title>
+<style>
+:root{--bg:#f6f3fb;--card:#fff;--ink:#1d1633;--mut:#6b6485;--acc:#5b3df5;--line:#e3dcf3}
+@media (prefers-color-scheme:dark){:root{--bg:#14101f;--card:#1e1830;--ink:#f1ecff;--mut:#a79fc4;--acc:#8f78ff;--line:#352c52}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+header{padding:20px 16px 8px;max-width:720px;margin:auto}
+h1{margin:0;font-size:24px}
+header p{margin:4px 0 0;color:var(--mut);font-size:14px}
+main{max-width:720px;margin:auto;padding:12px 16px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+select,input,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:90px;resize:vertical}
+button{margin-top:14px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:inherit;font-weight:600}
+button.sec{background:transparent;color:var(--acc);border:1px solid var(--acc);margin-top:8px}
+button:disabled{opacity:.6}
+#out{white-space:pre-wrap;word-wrap:break-word}
+.err{color:#d6336c}
+</style>
+</head>
+<body>
+<header>
+<h1>For Author AI</h1>
+<p>Books likhne ka aapka apna AI saathi</p>
+</header>
+<main>
+<div class="card">
+<label for="task">Kya banana hai?</label>
+<select id="task">
+<option value="Write 10 catchy book title ideas with subtitles for">Book titles</option>
+<option value="Write an Amazon KDP book description (blurb) with a strong hook for">Blurb / description</option>
+<option value="Write 7 Amazon KDP backend keywords and 5 categories for">KDP keywords</option>
+<option value="Create a chapter-by-chapter outline for a book on">Chapter outline</option>
+<option value="Write the full first chapter, engaging and well structured, for a book on">Chapter likho</option>
+<option value="Give 25 page ideas for a colouring book with the theme">Colouring book pages</option>
+<option value="Write a short story for kids aged 5 and up about">Kids story</option>
+</select>
+<label for="lang">Bhasha</label>
+<select id="lang">
+<option>Hindi</option><option>English</option><option>Hinglish</option><option>Spanish</option><option>French</option><option>German</option><option>Marathi</option><option>Gujarati</option><option>Tamil</option><option>Bengali</option>
+</select>
+<label for="topic">Topic / theme</label>
+<textarea id="topic" placeholder="Jaise: Seniors ke liye yoga, ya Jungle ke janwar"></textarea>
+<button id="go">Banao</button>
+</div>
+<div class="card" id="res" hidden>
+<div id="out"></div>
+<button class="sec" id="copy">Copy karo</button>
+</div>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+$('go').onclick = async () => {
+  const topic = $('topic').value.trim();
+  if (!topic) { alert('Pehle topic likho'); return; }
+  const prompt = `${$('task').value}: ${topic}. Write the answer in ${$('lang').value}.`;
+  $('go').disabled = true; $('go').textContent = 'Likh raha hoon...';
+  $('res').hidden = false; $('out').className = ''; $('out').textContent = '';
+  try {
+    const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Error');
+    $('out').textContent = d.text;
+  } catch (e) {
+    $('out').className = 'err'; $('out').textContent = e.message;
+  }
+  $('go').disabled = false; $('go').textContent = 'Banao';
+};
+$('copy').onclick = () => { navigator.clipboard.writeText($('out').textContent); $('copy').textContent = 'Copy ho gaya'; setTimeout(()=>$('copy').textContent='Copy karo',1500); };
+</script>
+</body>
+</html>
