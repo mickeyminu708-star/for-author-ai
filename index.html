@@ -1,78 +1,154 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>For Author AI</title>
 <style>
-:root{--bg:#f6f3fb;--card:#fff;--ink:#1d1633;--mut:#6b6485;--acc:#5b3df5;--line:#e3dcf3}
-@media (prefers-color-scheme:dark){:root{--bg:#14101f;--card:#1e1830;--ink:#f1ecff;--mut:#a79fc4;--acc:#8f78ff;--line:#352c52}}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-header{padding:20px 16px 8px;max-width:720px;margin:auto}
-h1{margin:0;font-size:24px}
-header p{margin:4px 0 0;color:var(--mut);font-size:14px}
-main{max-width:720px;margin:auto;padding:12px 16px 40px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
-select,input,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
-textarea{min-height:90px;resize:vertical}
-button{margin-top:14px;width:100%;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:inherit;font-weight:600}
-button.sec{background:transparent;color:var(--acc);border:1px solid var(--acc);margin-top:8px}
-button:disabled{opacity:.6}
-#out{white-space:pre-wrap;word-wrap:break-word}
-.err{color:#d6336c}
-</style>
-</head>
-<body>
-<header>
-<h1>For Author AI</h1>
-<p>Books likhne ka aapka apna AI saathi</p>
-</header>
-<main>
-<div class="card">
-<label for="task">Kya banana hai?</label>
-<select id="task">
-<option value="Write 10 catchy book title ideas with subtitles for">Book titles</option>
-<option value="Write an Amazon KDP book description (blurb) with a strong hook for">Blurb / description</option>
-<option value="Write 7 Amazon KDP backend keywords and 5 categories for">KDP keywords</option>
-<option value="Create a chapter-by-chapter outline for a book on">Chapter outline</option>
-<option value="Write the full first chapter, engaging and well structured, for a book on">Chapter likho</option>
-<option value="Give 25 page ideas for a colouring book with the theme">Colouring book pages</option>
-<option value="Write a short story for kids aged 5 and up about">Kids story</option>
-</select>
-<label for="lang">Bhasha</label>
-<select id="lang">
-<option>Hindi</option><option>English</option><option>Hinglish</option><option>Spanish</option><option>French</option><option>German</option><option>Marathi</option><option>Gujarati</option><option>Tamil</option><option>Bengali</option>
-</select>
-<label for="topic">Topic / theme</label>
-<textarea id="topic" placeholder="Jaise: Seniors ke liye yoga, ya Jungle ke janwar"></textarea>
-<button id="go">Banao</button>
-</div>
-<div class="card" id="res" hidden>
-<div id="out"></div>
-<button class="sec" id="copy">Copy karo</button>
-</div>
-</main>
+:root{--bg:#12101f;--card:#1c1936;--in:#0f0d1c;--line:#322d5a;--tx:#f1eeff;--mu:#9a94c4;--ac:#8b7bff;--er:#ff6b8b;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,Roboto,sans-serif;padding:env(safe-area-inset-top) 0 40px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:14px 16px 6px}
+h1{margin:0;font-size:22px}h2{margin:0 0 10px;font-size:18px}.sub{color:var(--mu);padding:0 16px 8px;margin:0;font-size:14px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:8px 16px;position:sticky;top:0;background:var(--bg);z-index:2}
+nav button{flex:none;background:var(--card);color:var(--mu);border:1px solid var(--line);border-radius:20px;padding:8px 14px;font-size:14px}
+nav button.on{background:linear-gradient(90deg,#8b7bff,#d96bb0);color:#fff;border-color:transparent}
+main{padding:8px 16px;max-width:760px;margin:auto}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+label{display:block;color:var(--mu);font-size:14px;margin:10px 0 4px}
+textarea,input,select{width:100%;background:var(--in);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+textarea:focus,input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+button{font:inherit;cursor:pointer}.go,.sec{border:0;border-radius:10px;padding:11px 16px;margin-top:12px;color:#fff}
+.go{background:linear-gradient(90deg,#8b7bff,#d96bb0);font-weight:600}.sec{background:var(--in);border:1px solid var(--line);margin-right:8px}
+.go:disabled{opacity:.6}.st{margin-top:8px;font-size:14px;color:var(--mu)}.st.er{color:var(--er)}
+.row{display:flex;flex-wrap:wrap}.msg{padding:10px 12px;border-radius:12px;margin:8px 0;white-space:pre-wrap}.u{background:var(--in)}.a{background:#25214a}
+.ch{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:10px 0}.big{font-size:20px;font-weight:700}
+.note{font-size:13px;color:var(--mu);margin-top:8px}
+</style></head><body>
+<header><h1>For Author AI</h1><select id="lang" style="width:auto"></select></header>
+<p class="sub">Books likhne ka aapka apna AI saathi</p>
+<nav id="nav"></nav><main id="view"></main>
 <script>
-const $ = id => document.getElementById(id);
-$('go').onclick = async () => {
-  const topic = $('topic').value.trim();
-  if (!topic) { alert('Pehle topic likho'); return; }
-  const prompt = `${$('task').value}: ${topic}. Write the answer in ${$('lang').value}.`;
-  $('go').disabled = true; $('go').textContent = 'Likh raha hoon...';
-  $('res').hidden = false; $('out').className = ''; $('out').textContent = '';
-  try {
-    const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ prompt }) });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'Error');
-    $('out').textContent = d.text;
-  } catch (e) {
-    $('out').className = 'err'; $('out').textContent = e.message;
-  }
-  $('go').disabled = false; $('go').textContent = 'Banao';
-};
-$('copy').onclick = () => { navigator.clipboard.writeText($('out').textContent); $('copy').textContent = 'Copy ho gaya'; setTimeout(()=>$('copy').textContent='Copy karo',1500); };
-</script>
-</body>
-</html>
+const LANGS=["English","Hindi","Hinglish (Hindi in Roman letters)","Spanish","French","German","Portuguese","Italian","Arabic","Bengali","Tamil","Telugu","Marathi","Gujarati","Kannada","Malayalam","Punjabi","Urdu","Chinese","Japanese","Korean","Russian","Turkish","Indonesian","Dutch","Swahili"];
+const $=s=>document.querySelector(s);
+const ls={g:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},s:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let B=ls.g('fa_book',{}),CH=ls.g('fa_chars',[]),HIST=[];
+const save=()=>ls.s('fa_book',B);
+$('#lang').innerHTML=LANGS.map(l=>`<option>${l}</option>`).join('');
+$('#lang').value=ls.g('fa_lang','Hinglish (Hindi in Roman letters)');
+$('#lang').onchange=e=>ls.s('fa_lang',e.target.value);
+
+async function ai(prompt,history){
+  const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt:prompt+'\n\nWrite the answer in: '+$('#lang').value,history})});
+  let d={};try{d=await r.json()}catch{}
+  if(!r.ok)throw new Error(d.error||'Server error '+r.status);
+  return d;
+}
+const ctx=()=>[['Topic',B.topic],['Title',B.title],['Research',B.research],['Outline',B.outline],['Author bio',B.bio],['Blurb',B.blurb]]
+  .filter(x=>x[1]).map(x=>x[0]+': '+String(x[1]).slice(0,2500)).join('\n');
+
+const STEPS=[
+{id:'research',n:'1 Research',f:[['topic','Book idea / topic','Mom journal'],['angle','Aapka angle (optional)'],['tone','Tone','Warm, funny'],['reader','Readers','Adults, grandchildren']],
+ p:v=>`Build a research brief for a self-published book.\nTopic: ${v.topic}\nAngle: ${v.angle}\nTone: ${v.tone}\nReaders: ${v.reader}\nSections: 1 Reader problem, 2 Promise of the book, 3 Competing books and gaps, 4 Key topics, 5 Risks.`},
+{id:'title',n:'2 Title',f:[['count','Kitne titles','10']],p:v=>`${ctx()}\n\nGive ${v.count||10} book titles with subtitles (KDP style, keyword-rich). Mark the best 3 with a one-line reason.`},
+{id:'outline',n:'3 Outline',f:[['chapters','Chapters / sections','12']],p:v=>`${ctx()}\n\nWrite a detailed outline with ${v.chapters||12} chapters. Each: title plus 2-line summary.`},
+{id:'bio',n:'4 Author Bio',f:[['name','Author name','DLS'],['about','Aapke baare mein (optional)']],p:v=>`${ctx()}\n\nWrite a short Amazon author bio (80-100 words) for ${v.name}. About the author: ${v.about}.`},
+{id:'blurb',n:'5 Blurb & Cover',f:[],p:()=>`${ctx()}\n\nWrite: 1) Amazon back-cover blurb (150 words, strong hook), 2) seven KDP keywords, 3) three category suggestions, 4) a cover design brief with colours, fonts and an image prompt.`},
+{id:'write',n:'6 Write',f:[['ch','Kaunsa chapter / section','Chapter 1'],['len','Length','about 600 words']],p:v=>`${ctx()}\n\nWrite ${v.ch}, ${v.len}. Keep the tone consistent and engaging.`}
+];
+const TOOLS=[
+{id:'niche',n:'Niche Finder',f:[['seed','Broad area','journals, colouring books'],['mkt','Store','Amazon KDP']],p:v=>`Act as a self-publishing market analyst. Find 10 low-competition niches in "${v.seed}" for ${v.mkt}. For each: reader, why it sells, competition (low/medium/high), example title, 3 keywords. State clearly that these are estimates, not live data.`},
+{id:'kw',n:'Keyword Scout',f:[['bk','Book topic'],['mkt','Store','Amazon.com']],p:v=>`Suggest 30 buyer-intent search keywords and 7 best KDP backend keywords for a book about "${v.bk}" on ${v.mkt}. Group by intent. Estimates only, no live data.`},
+{id:'ana',n:'Book Analyzer',f:[['bk','Title / idea / description paste karo']],p:v=>`Analyze this book idea like a publishing consultant: strengths, weaknesses, target reader, title and cover improvements, pricing advice, and a rough sales potential (estimate, not live data).\n\n${v.bk}`},
+{id:'col',n:'Colouring Pages',f:[['theme','Theme','Jungle animals'],['n','Kitne pages','25']],p:v=>`List ${v.n} colouring page ideas for the theme "${v.theme}". For each: a one-line scene and a detailed black-and-white line-art image prompt (thick clean outlines, no shading, white background).`},
+{id:'img',n:'Cover & Cartoon Prompts',f:[['bk','Book / character'],['sty','Style','cute cartoon, bright colours']],p:v=>`Write 8 image-generation prompts (cover, characters, scenes) for: ${v.bk}. Style: ${v.sty}. Keep each prompt 1-2 sentences, ready to paste into an image tool.`},
+{id:'sell',n:'Other Stores',f:[['bk','Book'],['site','Store','Etsy, Gumroad, Google Play Books, Kobo']],p:v=>`Give a selling plan for this book on: ${v.site}. For each store: setup steps, title and description tips, pricing, and promotion ideas.\n\nBook: ${v.bk}`}
+];
+
+const TABS=[...STEPS.map(s=>({k:'s:'+s.id,n:s.n})),...TOOLS.map(t=>({k:'t:'+t.id,n:t.n})),
+ {k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
+function nav(k){
+  $('#nav').innerHTML=TABS.map(t=>`<button class="${t.k===k?'on':''}" data-k="${t.k}">${esc(t.n)}</button>`).join('');
+  $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>open(b.dataset.k));
+  const on=$('#nav .on');on&&on.scrollIntoView({inline:'center',block:'nearest'});
+}
+function open(k){ls.s('fa_tab',k);nav(k);const [t,id]=k.split(':');
+  if(t==='s')gen(STEPS.find(x=>x.id===id),true);else if(t==='t')gen(TOOLS.find(x=>x.id===id),false);
+  else ({chat,chars,spine,roy,exp})[k]();}
+
+function gen(d,studio){
+  const sv=ls.g('fa_f_'+d.id,{});
+  const first=d.id==='research'?`<label>Final book title (baad mein sab steps use karenge)<input id="bt" value="${esc(B.title||'')}" placeholder="Title chunne ke baad yahan likho"></label>`:'';
+  $('#view').innerHTML=`<section class="card"><h2>${esc(d.n)}</h2>${studio?first:''}
+  ${d.f.map(([k,l,ph])=>`<label>${esc(l)}<textarea rows="2" data-k="${k}" placeholder="${esc(ph||'')}">${esc(sv[k]||'')}</textarea></label>`).join('')}
+  <button class="go" id="go">Banao</button><div class="st" id="st"></div>
+  <label>Result (edit kar sakte ho)</label><textarea id="out" rows="14"></textarea>
+  <div class="row"><button class="sec" id="cp">Copy</button><button class="sec" id="nx">Agla step</button></div>
+  ${d.id==='niche'||d.id==='kw'||d.id==='ana'?'<p class="note">Ye AI ke andaaze hain. Asli BSR ya income Amazon ke apne data se milta hai.</p>':''}</section>`;
+  const keep={research:'research',title:'titles',outline:'outline',bio:'bio',blurb:'blurb',write:'last'}[d.id];
+  if(studio&&keep&&B[keep])$('#out').value=B[keep];
+  if($('#bt'))$('#bt').oninput=e=>{B.title=e.target.value;save()};
+  $('#out').oninput=()=>{if(studio&&keep){B[keep]=$('#out').value;save()}};
+  $('#cp').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('#out').value);$('#st').textContent='Copy ho gaya'};
+  $('#nx').onclick=()=>{const i=TABS.findIndex(t=>t.k===ls.g('fa_tab'));open(TABS[Math.min(i+1,TABS.length-1)].k)};
+  $('#go').onclick=async()=>{
+    const v={};document.querySelectorAll('[data-k]').forEach(e=>v[e.dataset.k]=e.value.trim());
+    ls.s('fa_f_'+d.id,v);if(d.id==='research'&&v.topic){B.topic=v.topic;save()}
+    const b=$('#go');b.disabled=true;$('#st').className='st';$('#st').textContent='Likh raha hoon... busy ho to agla Gemini model try hoga';
+    try{const r=await ai(d.p(v));$('#out').value=r.text;$('#st').textContent='Ho gaya ('+r.model+')';
+      if(studio&&keep){B[keep]=r.text;if(keep==='last'){B.ms=(B.ms||'')+`\n\n## ${v.ch}\n${r.text}`}save()}}
+    catch(e){$('#st').className='st er';$('#st').textContent=e.message}
+    b.disabled=false};
+}
+
+function chat(){
+  $('#view').innerHTML=`<section class="card"><h2>Live Assist</h2><div id="log"></div>
+  <textarea id="q" rows="3" placeholder="Likhte waqt kuch bhi pucho: idea, rewrite, grammar..."></textarea>
+  <button class="go" id="go">Bhejo</button><button class="sec" id="cl">Naya chat</button><div class="st" id="st"></div></section>`;
+  const draw=()=>{$('#log').innerHTML=HIST.map(m=>`<div class="msg ${m.role==='user'?'u':'a'}">${esc(m.text)}</div>`).join('')};draw();
+  $('#cl').onclick=()=>{HIST=[];draw()};
+  $('#go').onclick=async()=>{const q=$('#q').value.trim();if(!q)return;
+    const b=$('#go');b.disabled=true;$('#st').className='st';$('#st').textContent='Soch raha hoon...';
+    try{const r=await ai(q,HIST);HIST.push({role:'user',text:q},{role:'model',text:r.text});$('#q').value='';draw();$('#st').textContent=''}
+    catch(e){$('#st').className='st er';$('#st').textContent=e.message}b.disabled=false};
+}
+
+function chars(){
+  const draw=()=>{$('#list').innerHTML=CH.length?CH.map((c,i)=>`<div class="ch"><div><b>${esc(c.name)}</b> <span class="note">${esc(c.role)}</span><div style="white-space:pre-wrap">${esc(c.note)}</div></div>
+  <div><button class="sec" data-p="${i}">AI profile</button><button class="sec" data-d="${i}">Hatao</button></div></div>`).join(''):'<p class="note">Abhi koi character nahi. Upar se jodo.</p>';
+    $('#list').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{CH.splice(b.dataset.d,1);ls.s('fa_chars',CH);draw()});
+    $('#list').querySelectorAll('[data-p]').forEach(b=>b.onclick=async()=>{const c=CH[b.dataset.p];b.disabled=true;b.textContent='...';
+      try{const r=await ai(`${ctx()}\n\nCreate a short character profile (looks, personality, goal, flaw, voice) for "${c.name}" (${c.role}). Notes: ${c.note}`);c.note=r.text;ls.s('fa_chars',CH)}catch(e){alert(e.message)}draw()})};
+  $('#view').innerHTML=`<section class="card"><h2>Character Tracker</h2><label>Naam<input id="cn"></label><label>Role<input id="cr" placeholder="hero, dost, villain"></label>
+  <label>Notes<textarea id="cx" rows="2"></textarea></label><button class="go" id="add">Jodo</button><div id="list"></div></section>`;
+  $('#add').onclick=()=>{const n=$('#cn').value.trim();if(!n)return;CH.push({name:n,role:$('#cr').value,note:$('#cx').value});ls.s('fa_chars',CH);
+    ['#cn','#cr','#cx'].forEach(s=>$(s).value='');draw()};draw();
+}
+
+function spine(){
+  $('#view').innerHTML=`<section class="card"><h2>KDP Print Cover Calculator</h2>
+  <label>Trim width (inch)<input id="w" type="number" step="0.01" value="8.5"></label><label>Trim height (inch)<input id="h" type="number" step="0.01" value="11"></label>
+  <label>Pages<input id="pg" type="number" value="120"></label>
+  <label>Paper<select id="pp"><option value="0.002252">Black and white, white paper</option><option value="0.0025">Black and white, cream paper</option><option value="0.002252">Standard colour</option><option value="0.002347">Premium colour</option></select></label>
+  <div id="res" style="margin-top:12px"></div><p class="note">Bleed 0.125 inch har taraf jodi gayi hai. Final size KDP ke Cover Calculator se ek baar match kar lo.</p></section>`;
+  const f=()=>{const w=+$('#w').value,h=+$('#h').value,p=+$('#pg').value,s=p*+$('#pp').value;
+    $('#res').innerHTML=`<div class="big">Spine: ${s.toFixed(3)} in</div><div>Poora cover: ${(2*w+s+0.25).toFixed(3)} x ${(h+0.25).toFixed(3)} in</div><div class="note">Spine par text tab hi rakho jab pages 79 se zyada hon.</div>`};
+  ['#w','#h','#pg','#pp'].forEach(s=>$(s).oninput=f);f();
+}
+
+function roy(){
+  $('#view').innerHTML=`<section class="card"><h2>Royalty Calculator</h2><p class="note">Apne asli numbers daalo. Printing cost KDP ke calculator se lo.</p>
+  <label>Book price<input id="pr" type="number" step="0.01" value="9.99"></label><label>Printing cost per book<input id="pc" type="number" step="0.01" value="3.50"></label>
+  <label>Royalty percent<input id="rp" type="number" value="60"></label><label>Copies per din<input id="cd" type="number" step="0.1" value="1"></label><div id="res" style="margin-top:12px"></div></section>`;
+  const f=()=>{const r=+$('#pr').value*(+$('#rp').value/100)-+$('#pc').value,d=r*+$('#cd').value;
+    $('#res').innerHTML=`<div class="big">Per book: ${r.toFixed(2)}</div><div>Din: ${d.toFixed(2)} | Mahina: ${(d*30).toFixed(2)} | Saal: ${(d*365).toFixed(0)}</div>`};
+  ['#pr','#pc','#rp','#cd'].forEach(s=>$(s).oninput=f);f();
+}
+
+function exp(){
+  $('#view').innerHTML=`<section class="card"><h2>Export</h2><p class="note">Ab tak ka kaam ek text file mein download hoga.</p>
+  <button class="go" id="dl">Download .txt</button><button class="sec" id="rs">Naya book shuru karo</button></section>`;
+  $('#dl').onclick=()=>{const t=[B.title&&'# '+B.title,B.bio&&'## Author Bio\n'+B.bio,B.blurb&&'## Blurb and Cover\n'+B.blurb,B.outline&&'## Outline\n'+B.outline,B.ms&&'## Manuscript'+B.ms].filter(Boolean).join('\n\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t||'Abhi kuch nahi likha'],{type:'text/plain'}));a.download=(B.title||'book')+'.txt';a.click()};
+  $('#rs').onclick=()=>{if(confirm('Purana book saaf ho jayega. Pakka?')){B={};save();open('s:research')}};
+}
+open(ls.g('fa_tab','s:research'));
+</script></body></html>
