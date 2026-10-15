@@ -16,7 +16,7 @@ textarea,input,select{width:100%;background:var(--in);color:var(--tx);border:1px
 textarea:focus,input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
 button{font:inherit;cursor:pointer}.go,.sec{border:0;border-radius:10px;padding:11px 16px;margin-top:12px;color:#fff}
 .go{background:linear-gradient(90deg,#8b7bff,#d96bb0);font-weight:600}.sec{background:var(--in);border:1px solid var(--line);margin-right:8px}
-.go:disabled{opacity:.6}a.go,a.sec{display:inline-block;text-decoration:none;line-height:1.4}.st{margin-top:8px;font-size:14px;color:var(--mu)}.st.er{color:var(--er)}
+#pr{display:none}@media print{body>*:not(#pr){display:none!important}body{padding:0!important;background:#fff}#pr{display:block}.pg{display:flex;align-items:center;justify-content:center;overflow:hidden;break-after:page;background:#fff}}.go:disabled{opacity:.6}a.go,a.sec{display:inline-block;text-decoration:none;line-height:1.4}.st{margin-top:8px;font-size:14px;color:var(--mu)}.st.er{color:var(--er)}
 .row{display:flex;flex-wrap:wrap}.msg{padding:10px 12px;border-radius:12px;margin:8px 0;white-space:pre-wrap}.u{background:var(--in)}.a{background:#25214a}
 .ch{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:10px 0}.big{font-size:20px;font-weight:700}
 .note{font-size:13px;color:var(--mu);margin-top:8px}
@@ -35,9 +35,9 @@ $('#lang').innerHTML=LANGS.map(l=>`<option>${l}</option>`).join('');
 $('#lang').value=ls.g('fa_lang','Hinglish (Hindi in Roman letters)');
 $('#lang').onchange=e=>ls.s('fa_lang',e.target.value);
 
-async function ai(prompt,history){
+async function ai(prompt,history,raw){
   const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({prompt:prompt+'\n\nWrite the answer in: '+$('#lang').value,history})});
+    body:JSON.stringify({prompt:raw?prompt:prompt+'\n\nWrite the answer in: '+$('#lang').value,history})});
   let d={};try{d=await r.json()}catch{}
   if(!r.ok)throw new Error(d.error||'Server error '+r.status);
   return d;
@@ -64,7 +64,7 @@ const TOOLS=[
 ];
 
 const TABS=[...STEPS.map(s=>({k:'s:'+s.id,n:s.n})),...TOOLS.map(t=>({k:'t:'+t.id,n:t.n})),
- {k:'amz',n:'Amazon Search'},{k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
+ {k:'cb',n:'Colouring Book'},{k:'amz',n:'Amazon Search'},{k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
 function nav(k){
   $('#nav').innerHTML=TABS.map(t=>`<button class="${t.k===k?'on':''}" data-k="${t.k}">${esc(t.n)}</button>`).join('');
   $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>open(b.dataset.k));
@@ -72,7 +72,7 @@ function nav(k){
 }
 function open(k){ls.s('fa_tab',k);nav(k);const [t,id]=k.split(':');
   if(t==='s')gen(STEPS.find(x=>x.id===id),true);else if(t==='t')gen(TOOLS.find(x=>x.id===id),false);
-  else ({amz,chat,chars,spine,roy,exp})[k]();}
+  else ({cb,amz,chat,chars,spine,roy,exp})[k]();}
 
 function gen(d,studio){
   const sv=ls.g('fa_f_'+d.id,{});
@@ -98,6 +98,54 @@ function gen(d,studio){
       if(studio&&keep){B[keep]=r.text;if(keep==='last'){B.ms=(B.ms||'')+`\n\n## ${v.ch}\n${r.text}`}save()}}
     catch(e){$('#st').className='st er';$('#st').textContent=e.message}
     b.disabled=false};
+}
+
+let CB=ls.g('fa_cb',{title:'',theme:'',n:10,style:0,trim:0,blank:true}),PG=[],last=0,stop=false;
+const STY=[['Cute cartoon (kids)','cute friendly cartoon, simple shapes, big areas to colour'],['Toddler simple','very simple big bold shapes, minimal details, thick lines'],['Detailed (adults, seniors)','detailed intricate line art, fine patterns, relaxing'],['Whimsical fantasy','whimsical fantasy storybook illustration, magical'],['Realistic line art','realistic detailed line drawing']];
+const TRIM=[['8.5 x 11 in',8.5,11,816,1056],['8.5 x 8.5 in',8.5,8.5,1024,1024],['8 x 10 in',8,10,819,1024],['6 x 9 in',6,9,683,1024]];
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+function cb(){
+  const o=(a,v)=>a.map((x,i)=>`<option value="${i}"${i==v?' selected':''}>${esc(x[0])}</option>`).join('');
+  $('#view').innerHTML=`<section class="card"><h2>Colouring Book Maker</h2>
+  <label>Book title<input id="ct" value="${esc(CB.title)}"></label><label>Theme<textarea id="cth" rows="2" placeholder="Jungle animals">${esc(CB.theme)}</textarea></label>
+  <label>Kitne pages (max 30)<input id="cn" type="number" min="1" max="30" value="${CB.n}"></label>
+  <label>Style<select id="cs">${o(STY,CB.style)}</select></label><label>Page size (KDP trim)<select id="cz">${o(TRIM,CB.trim)}</select></label>
+  <label><input id="cbk" type="checkbox" style="width:auto" ${CB.blank?'checked':''}> Har page ke baad khali page</label>
+  <button class="go" id="c1">1. Page ideas banao</button><div class="st" id="cst"></div><div id="cg"></div>
+  <div class="row"><button class="sec" id="c2">2. Sab tasveer banao</button><button class="sec" id="cx">Rok do</button><button class="sec" id="c3">3. PDF banao</button></div>
+  <p class="note">Tasveer free Pollinations se aati hai, 1 page mein lagbhag 20 se 30 second lagte hain, to 10 pages mein 4 se 5 minute. Is dauran page khula rakho. Tasveeren reload par hat jati hain, isliye PDF turant banao. PDF ke liye print screen mein Save as PDF chuno. KDP par AI images ki jaankari dena zaroori hai.</p></section>`;
+  const sv=()=>{CB={title:$('#ct').value,theme:$('#cth').value,n:Math.min(30,+$('#cn').value||10),style:+$('#cs').value,trim:+$('#cz').value,blank:$('#cbk').checked};ls.s('fa_cb',CB)};
+  ['#ct','#cth','#cn','#cs','#cz','#cbk'].forEach(x=>{$(x).oninput=sv;$(x).onchange=sv});
+  const draw=()=>{$('#cg').innerHTML=PG.map((p,i)=>`<div class="ch" style="display:block"><textarea rows="2" data-i="${i}">${esc(p.s)}</textarea><div class="st" id="ps${i}">${p.src?'Ready':'Intezaar'}</div>${p.src?`<img src="${p.src}" alt="" style="width:100%;background:#fff;border-radius:8px;margin-top:6px">`:''}<button class="sec" data-r="${i}">Dobara banao</button></div>`).join('');
+    $('#cg').querySelectorAll('textarea').forEach(t=>t.oninput=()=>PG[t.dataset.i].s=t.value);
+    $('#cg').querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{stop=false;one(+b.dataset.r,true)})};
+  async function one(i,force){
+    const p=PG[i];if(!p||(p.src&&!force))return;const st=()=>$('#ps'+i),T=TRIM[CB.trim];
+    const full=`${p.s}, black and white colouring book page, ${STY[CB.style][1]}, clean bold black outlines, pure white background, no shading, no grey, no text, no watermark`;
+    for(let a=0;a<4&&!stop;a++){
+      const gap=16500-(Date.now()-last);if(gap>0){st()&&(st().textContent='Line mein... '+Math.ceil(gap/1000)+'s');await wait(gap)}
+      last=Date.now();st()&&(st().textContent='Ban rahi hai...');
+      const u=`https://image.pollinations.ai/prompt/${encodeURIComponent(full)}?model=${a%2?'turbo':'flux'}&width=${T[3]}&height=${T[4]}&nologo=true&seed=${Math.floor(Math.random()*1e6)}`;
+      try{const r=await fetch(u);if(!r.ok)throw new Error(r.status);const b=await r.blob();if(!/image/.test(b.type))throw new Error('x');p.src=URL.createObjectURL(b);draw();return}
+      catch(e){if(e instanceof TypeError){p.src=u;draw();return}st()&&(st().textContent='Dobara koshish ('+(a+1)+'/4)...')}
+    }
+    st()&&(st().textContent='Nahi bani. Dobara banao dabao.');
+  }
+  $('#c1').onclick=async()=>{sv();if(!CB.theme.trim()){$('#cst').textContent='Pehle theme likho';return}
+    const b=$('#c1');b.disabled=true;$('#cst').className='st';$('#cst').textContent='Ideas ban rahe hain...';
+    try{const r=await ai(`Colouring book theme: ${CB.theme}. Return ONLY a JSON array of ${CB.n} short, different scene descriptions in English (max 15 words each), each easy to draw as one colouring page. No numbering, no extra text.`,[],true);
+      const m=r.text.match(/\[[\s\S]*\]/);PG=JSON.parse(m[0]).map(x=>({s:String(x),src:''}));draw();$('#cst').textContent='Ideas taiyar ('+PG.length+'). Chaho to edit karo, phir step 2.'}
+    catch(e){$('#cst').className='st er';$('#cst').textContent='Ideas nahi bane, dobara dabao. '+e.message}b.disabled=false};
+  $('#c2').onclick=async()=>{if(!PG.length){$('#cst').textContent='Pehle step 1 chalao';return}stop=false;for(let i=0;i<PG.length&&!stop;i++)await one(i);$('#cst').textContent=stop?'Ruk gaya':'Sab ho gaya. Ab step 3.'};
+  $('#cx').onclick=()=>{stop=true};
+  $('#c3').onclick=()=>{const T=TRIM[CB.trim],ok=PG.filter(p=>p.src);if(!ok.length){alert('Pehle tasveer banao');return}
+    let s=$('#pgs');if(!s){s=document.createElement('style');s.id='pgs';document.head.appendChild(s)}
+    s.textContent=`@page{size:${T[1]}in ${T[2]}in;margin:0}`;let d=$('#pr');if(d)d.remove();d=document.createElement('div');d.id='pr';
+    const pg=h=>`<div class="pg" style="width:${T[1]}in;height:${T[2]}in">${h}</div>`,im=p=>`<img src="${p.src}" alt="" style="max-width:${T[1]-.5}in;max-height:${T[2]-.5}in">`;
+    let h=pg(`<div style="text-align:center;color:#000"><h1 style="font-size:34pt">${esc(CB.title||'Colouring Book')}</h1><p>This book belongs to ${'_'.repeat(18)}</p></div>`);
+    if(CB.blank)h+=pg('');ok.forEach(p=>{h+=pg(im(p));if(CB.blank)h+=pg('')});
+    d.innerHTML=h;document.body.appendChild(d);setTimeout(()=>window.print(),500)};
+  draw();
 }
 
 function amz(){
