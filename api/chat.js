@@ -1,12 +1,13 @@
 export const config = { maxDuration: 60 };
 
+// Ek ke baad ek try hoga. Koi model busy ya band ho to agla chalega.
 const MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.5-flash-lite',
   'gemini-flash-latest',
   'gemini-flash-lite-latest',
-  'gemini-2.0-flash',
-  'gemini-2.0-flash-lite'
+  'gemini-3.1-flash-lite',
+  'gemini-3-flash-preview',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite'
 ];
 
 const SYSTEM =
@@ -67,8 +68,10 @@ export default async function handler(req, res) {
         }
 
         lastErr = data.error?.message || `Error ${r.status}`;
+        // Key galat ho to aage try karna bekaar hai
         if (r.status === 400 && /API key/i.test(lastErr)) return res.status(400).json({ error: lastErr });
         if (r.status === 401 || r.status === 403) return res.status(r.status).json({ error: lastErr });
+        // Baaki sab (busy, limit, model nahi mila) mein agla model try karo
         await sleep(400);
       } catch (e) {
         lastErr = e.name === 'AbortError' ? 'Model ne der lagayi, agla try ho raha hai.' : String(e);
