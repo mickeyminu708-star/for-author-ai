@@ -64,7 +64,7 @@ const TOOLS=[
 ];
 
 const TABS=[...STEPS.map(s=>({k:'s:'+s.id,n:s.n})),...TOOLS.map(t=>({k:'t:'+t.id,n:t.n})),
- {k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
+ {k:'amz',n:'Amazon Search'},{k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
 function nav(k){
   $('#nav').innerHTML=TABS.map(t=>`<button class="${t.k===k?'on':''}" data-k="${t.k}">${esc(t.n)}</button>`).join('');
   $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>open(b.dataset.k));
@@ -72,7 +72,7 @@ function nav(k){
 }
 function open(k){ls.s('fa_tab',k);nav(k);const [t,id]=k.split(':');
   if(t==='s')gen(STEPS.find(x=>x.id===id),true);else if(t==='t')gen(TOOLS.find(x=>x.id===id),false);
-  else ({chat,chars,spine,roy,exp})[k]();}
+  else ({amz,chat,chars,spine,roy,exp})[k]();}
 
 function gen(d,studio){
   const sv=ls.g('fa_f_'+d.id,{});
@@ -81,13 +81,14 @@ function gen(d,studio){
   ${d.f.map(([k,l,ph])=>`<label>${esc(l)}<textarea rows="2" data-k="${k}" placeholder="${esc(ph||'')}">${esc(sv[k]||'')}</textarea></label>`).join('')}
   <button class="go" id="go">Banao</button><div class="st" id="st"></div>
   <label>Result (edit kar sakte ho)</label><textarea id="out" rows="14"></textarea>
-  <div class="row"><button class="sec" id="cp">Copy</button><button class="sec" id="nx">Agla step</button></div>
+  <div class="row"><button class="sec" id="cp">Copy</button><button class="sec" id="nx">Agla step</button>${['niche','kw','ana','title'].includes(d.id)?'<button class="sec" id="am">Amazon par dekho</button>':''}</div>
   ${d.id==='niche'||d.id==='kw'||d.id==='ana'?'<p class="note">Ye AI ke andaaze hain. Asli BSR ya income Amazon ke apne data se milta hai.</p>':''}</section>`;
   const keep={research:'research',title:'titles',outline:'outline',bio:'bio',blurb:'blurb',write:'last'}[d.id];
   if(studio&&keep&&B[keep])$('#out').value=B[keep];
   if($('#bt'))$('#bt').oninput=e=>{B.title=e.target.value;save()};
   $('#out').oninput=()=>{if(studio&&keep){B[keep]=$('#out').value;save()}};
   $('#cp').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('#out').value);$('#st').textContent='Copy ho gaya'};
+  if($('#am'))$('#am').onclick=()=>{const e=document.querySelector('[data-k]');window.open('https://www.amazon.com/s?k='+encodeURIComponent((e&&e.value.trim())||B.topic||'')+'&i=stripbooks','_blank','noopener')};
   $('#nx').onclick=()=>{const i=TABS.findIndex(t=>t.k===ls.g('fa_tab'));open(TABS[Math.min(i+1,TABS.length-1)].k)};
   $('#go').onclick=async()=>{
     const v={};document.querySelectorAll('[data-k]').forEach(e=>v[e.dataset.k]=e.value.trim());
@@ -97,6 +98,17 @@ function gen(d,studio){
       if(studio&&keep){B[keep]=r.text;if(keep==='last'){B.ms=(B.ms||'')+`\n\n## ${v.ch}\n${r.text}`}save()}}
     catch(e){$('#st').className='st er';$('#st').textContent=e.message}
     b.disabled=false};
+}
+
+function amz(){
+  $('#view').innerHTML=`<section class="card"><h2>Amazon Search</h2><p class="note">Ye button seedha Amazon kholta hai. Wahan asli results, reviews aur Best Sellers rank dikhte hain.</p>
+  <label>Kya dhundna hai<input id="aq" value="${esc(B.topic||'')}" placeholder="jaise: mom journal"></label>
+  <label>Store<select id="as"><option>amazon.com</option><option>amazon.in</option><option>amazon.co.uk</option><option>amazon.de</option><option>amazon.ca</option><option>amazon.com.au</option></select></label>
+  <button class="go" id="a1">Amazon par books dhundo</button><button class="sec" id="a2">Best Sellers dekho</button>
+  <p class="note">Tip: Amazon ke search box mein topic likhte waqt jo suggestions aate hain, wahi log sach mein search karte hain.</p></section>`;
+  const q=()=>encodeURIComponent($('#aq').value.trim());
+  $('#a1').onclick=()=>window.open('https://www.'+$('#as').value+'/s?k='+q()+'&i=stripbooks','_blank','noopener');
+  $('#a2').onclick=()=>window.open('https://www.'+$('#as').value+'/gp/bestsellers/books','_blank','noopener');
 }
 
 function chat(){
