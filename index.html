@@ -16,7 +16,7 @@ textarea,input,select{width:100%;background:var(--in);color:var(--tx);border:1px
 textarea:focus,input:focus,select:focus,button:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
 button{font:inherit;cursor:pointer}.go,.sec{border:0;border-radius:10px;padding:11px 16px;margin-top:12px;color:#fff}
 .go{background:linear-gradient(90deg,#8b7bff,#d96bb0);font-weight:600}.sec{background:var(--in);border:1px solid var(--line);margin-right:8px}
-.go:disabled{opacity:.6}.st{margin-top:8px;font-size:14px;color:var(--mu)}.st.er{color:var(--er)}
+.go:disabled{opacity:.6}a.go,a.sec{display:inline-block;text-decoration:none;line-height:1.4}.st{margin-top:8px;font-size:14px;color:var(--mu)}.st.er{color:var(--er)}
 .row{display:flex;flex-wrap:wrap}.msg{padding:10px 12px;border-radius:12px;margin:8px 0;white-space:pre-wrap}.u{background:var(--in)}.a{background:#25214a}
 .ch{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:10px 0}.big{font-size:20px;font-weight:700}
 .note{font-size:13px;color:var(--mu);margin-top:8px}
@@ -81,14 +81,14 @@ function gen(d,studio){
   ${d.f.map(([k,l,ph])=>`<label>${esc(l)}<textarea rows="2" data-k="${k}" placeholder="${esc(ph||'')}">${esc(sv[k]||'')}</textarea></label>`).join('')}
   <button class="go" id="go">Banao</button><div class="st" id="st"></div>
   <label>Result (edit kar sakte ho)</label><textarea id="out" rows="14"></textarea>
-  <div class="row"><button class="sec" id="cp">Copy</button><button class="sec" id="nx">Agla step</button>${['niche','kw','ana','title'].includes(d.id)?'<button class="sec" id="am">Amazon par dekho</button>':''}</div>
+  <div class="row"><button class="sec" id="cp">Copy</button><button class="sec" id="nx">Agla step</button>${['niche','kw','ana','title'].includes(d.id)?'<a class="sec" id="am" target="_blank" rel="noopener" href="https://www.amazon.com">Amazon par dekho</a>':''}</div>
   ${d.id==='niche'||d.id==='kw'||d.id==='ana'?'<p class="note">Ye AI ke andaaze hain. Asli BSR ya income Amazon ke apne data se milta hai.</p>':''}</section>`;
   const keep={research:'research',title:'titles',outline:'outline',bio:'bio',blurb:'blurb',write:'last'}[d.id];
   if(studio&&keep&&B[keep])$('#out').value=B[keep];
   if($('#bt'))$('#bt').oninput=e=>{B.title=e.target.value;save()};
   $('#out').oninput=()=>{if(studio&&keep){B[keep]=$('#out').value;save()}};
   $('#cp').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('#out').value);$('#st').textContent='Copy ho gaya'};
-  if($('#am'))$('#am').onclick=()=>{const e=document.querySelector('[data-k]');window.open('https://www.amazon.com/s?k='+encodeURIComponent((e&&e.value.trim())||B.topic||'')+'&i=stripbooks','_blank','noopener')};
+  if($('#am')){const sh=()=>{const e=document.querySelector('[data-k]');$('#am').href='https://www.amazon.com/s?k='+encodeURIComponent((e&&e.value.trim())||B.topic||'')+'&i=stripbooks'};sh();$('#am').onpointerdown=sh;$('#am').onclick=sh}
   $('#nx').onclick=()=>{const i=TABS.findIndex(t=>t.k===ls.g('fa_tab'));open(TABS[Math.min(i+1,TABS.length-1)].k)};
   $('#go').onclick=async()=>{
     const v={};document.querySelectorAll('[data-k]').forEach(e=>v[e.dataset.k]=e.value.trim());
@@ -104,11 +104,11 @@ function amz(){
   $('#view').innerHTML=`<section class="card"><h2>Amazon Search</h2><p class="note">Ye button seedha Amazon kholta hai. Wahan asli results, reviews aur Best Sellers rank dikhte hain.</p>
   <label>Kya dhundna hai<input id="aq" value="${esc(B.topic||'')}" placeholder="jaise: mom journal"></label>
   <label>Store<select id="as"><option>amazon.com</option><option>amazon.in</option><option>amazon.co.uk</option><option>amazon.de</option><option>amazon.ca</option><option>amazon.com.au</option></select></label>
-  <button class="go" id="a1">Amazon par books dhundo</button><button class="sec" id="a2">Best Sellers dekho</button>
+  <a class="go" id="a1" target="_blank" rel="noopener" href="https://www.amazon.com">Amazon par books dhundo</a><a class="sec" id="a2" target="_blank" rel="noopener" href="https://www.amazon.com/gp/bestsellers/books">Best Sellers dekho</a>
   <p class="note">Tip: Amazon ke search box mein topic likhte waqt jo suggestions aate hain, wahi log sach mein search karte hain.</p></section>`;
-  const q=()=>encodeURIComponent($('#aq').value.trim());
-  $('#a1').onclick=()=>window.open('https://www.'+$('#as').value+'/s?k='+q()+'&i=stripbooks','_blank','noopener');
-  $('#a2').onclick=()=>window.open('https://www.'+$('#as').value+'/gp/bestsellers/books','_blank','noopener');
+  const u=()=>{const q=encodeURIComponent($('#aq').value.trim()),h='https://www.'+$('#as').value;
+    $('#a1').href=h+'/s?k='+q+'&i=stripbooks';$('#a2').href=h+'/gp/bestsellers/books'};
+  ['#aq','#as'].forEach(x=>{$(x).oninput=u;$(x).onchange=u});u();
 }
 
 function chat(){
