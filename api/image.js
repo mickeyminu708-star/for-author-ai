@@ -33,7 +33,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ fallback: true, reason: 'Is key par koi image model available nahi' });
   }
 
-  let last = '';
+  const errs = [];
   for (const model of models.slice(0, 6)) {
     try {
       const r = await fetch(
@@ -55,14 +55,15 @@ export default async function handler(req, res) {
         if (inl?.data) {
           return res.status(200).json({ mime: inl.mimeType || inl.mime_type || 'image/png', data: inl.data, model });
         }
-        last = `${model}: image nahi di`;
+        errs.push(`${model}: image nahi di`);
         continue;
       }
-      last = `${model}: ${d.error?.message || r.status}`;
+      errs.push(`${model}: ${(d.error?.message || r.status).slice(0, 80)}`);
       if (r.status === 401 || r.status === 403) break;
     } catch (e) {
-      last = `${model}: ${String(e)}`;
+      errs.push(`${model}: ${String(e)}`);
     }
   }
-  return res.status(200).json({ fallback: true, reason: last || 'Image models fail hue' });
+  const found = models.join(', ');
+  return res.status(200).json({ fallback: true, reason: `Models: ${found} | ${errs.join(' || ')}` });
 }
