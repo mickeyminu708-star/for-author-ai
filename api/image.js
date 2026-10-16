@@ -1,10 +1,19 @@
 export const config = { maxDuration: 60 };
 
-// Gemini image models, ek ke baad ek. Naam Google badal sakta hai, isliye list mein kai rakhe hain.
-const MODELS = [
-  'gemini-2.5-flash-image',
-  'gemini-2.0-flash-preview-image-generation'
-];
+// Google se poochhta hai ki is key par kaun se image-generation models hain, phir unhi ko try karta hai.
+async function listImageModels(key) {
+  const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200', {
+    headers: { 'x-goog-api-key': key }
+  });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error?.message || `ListModels ${r.status}`);
+  return (d.models || [])
+    .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
+    .map((m) => m.name.replace(/^models\//, ''))
+    .filter((n) => /image/i.test(n))
+    // Naye models pehle
+    .sort((a, b) => b.localeCompare(a));
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -14,8 +23,18 @@ export default async function handler(req, res) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(200).json({ fallback: true, reason: 'GEMINI_API_KEY missing' });
 
+  let models;
+  try {
+    models = await listImageModels(key);
+  } catch (e) {
+    return res.status(200).json({ fallback: true, reason: 'Model list nahi aayi: ' + String(e.message || e) });
+  }
+  if (!models.length) {
+    return res.status(200).json({ fallback: true, reason: 'Is key par koi image model available nahi' });
+  }
+
   let last = '';
-  for (const model of MODELS) {
+  for (const model of models.slice(0, 4)) {
     try {
       const r = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -34,22 +53,16 @@ export default async function handler(req, res) {
         const part = parts.find((p) => p.inlineData || p.inline_data);
         const inl = part && (part.inlineData || part.inline_data);
         if (inl?.data) {
-          return res.status(200).json({
-            mime: inl.mimeType || inl.mime_type || 'image/png',
-            data: inl.data,
-            model
-          });
+          return res.status(200).json({ mime: inl.mimeType || inl.mime_type || 'image/png', data: inl.data, model });
         }
-        last = 'Model ne image nahi di';
+        last = `${model}: image nahi di`;
         continue;
       }
-      last = d.error?.message || `Error ${r.status}`;
-      // Key galat ho to aage try karna bekaar hai
+      last = `${model}: ${d.error?.message || r.status}`;
       if (r.status === 401 || r.status === 403) break;
     } catch (e) {
-      last = String(e);
+      last = `${model}: ${String(e)}`;
     }
   }
-  // Fallback: client Pollinations se banayega
-  return res.status(200).json({ fallback: true, reason: last });
+  return res.status(200).json({ fallback: true, reason: last || 'Image models fail hue' });
 }
