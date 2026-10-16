@@ -11,8 +11,8 @@ async function listImageModels(key) {
     .filter((m) => (m.supportedGenerationMethods || []).includes('generateContent'))
     .map((m) => m.name.replace(/^models\//, ''))
     .filter((n) => /image/i.test(n))
-    // Naye models pehle
-    .sort((a, b) => b.localeCompare(a));
+    // Flash wale pehle (free quota aksar inhi ka hota hai), phir baaki
+    .sort((a, b) => (/flash/i.test(b) ? 1 : 0) - (/flash/i.test(a) ? 1 : 0) || b.localeCompare(a));
 }
 
 export default async function handler(req, res) {
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   }
 
   let last = '';
-  for (const model of models.slice(0, 4)) {
+  for (const model of models.slice(0, 6)) {
     try {
       const r = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
