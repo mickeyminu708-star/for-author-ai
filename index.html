@@ -130,7 +130,7 @@ function img(){
       else{$('#ist').textContent='Gemini nahi chala, Pollinations se bana raha hoon...';
         const k=(ls.g('fa_cb',{}).key)||'';
         const u=`${k?'https://gen.pollinations.ai/image/':'https://image.pollinations.ai/prompt/'}${encodeURIComponent(full)}?width=${ar[2]}&height=${ar[3]}&nologo=true${k?'&key='+encodeURIComponent(k):''}&seed=${Math.floor(Math.random()*1e6)}`;
-        show(u,'image.jpg');$('#ist').textContent='Pollinations se bani (watermark ho sakta hai). Gemini: '+(d.reason||'').slice(0,120)}
+        show(u,'image.jpg');$('#ist').textContent='Pollinations se bani (watermark ho sakta hai). Gemini: '+(d.reason||'')}
     }catch(e){$('#ist').className='st er';$('#ist').textContent='Error: '+e.message}
     b.disabled=false};
   if(IM.p)$('#ist').textContent='Pichli prompt yaad hai, Banao dabao.';
