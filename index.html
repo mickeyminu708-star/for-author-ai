@@ -20,8 +20,13 @@ button{font:inherit;cursor:pointer}.go,.sec{border:0;border-radius:10px;padding:
 .row{display:flex;flex-wrap:wrap}.msg{padding:10px 12px;border-radius:12px;margin:8px 0;white-space:pre-wrap}.u{background:var(--in)}.a{background:#dbeafe}
 .ch{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding:10px 0}.big{font-size:20px;font-weight:700}
 .note{font-size:13px;color:var(--mu);margin-top:8px}
-</style></head><body>
-<header><h1>MMDSAuthor AI</h1><select id="lang" style="width:auto"></select></header>
+.brand{display:flex;align-items:center;gap:10px;min-width:0}.logo{width:44px;height:44px;flex:none;filter:drop-shadow(0 2px 6px rgba(29,111,224,.25))}
+header{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 1px 6px rgba(29,111,224,.06);padding:12px 16px}
+header h1{font-size:19px;color:#0b2545;line-height:1.2}nav{box-shadow:0 3px 8px rgba(29,111,224,.06)}
+.card{box-shadow:0 2px 12px rgba(29,111,224,.08);border-radius:16px}.sub{color:var(--mu)}
+nav button{box-shadow:0 1px 3px rgba(0,0,0,.05)}button.go{box-shadow:0 4px 12px rgba(29,111,224,.25)}
+</style><meta name="theme-color" content="#1d6fe0"><link rel="manifest" href="/manifest.json"><link rel="icon" href="/icon.svg" type="image/svg+xml"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MMDSAuthor AI"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<header><div class="brand"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d6fe0"/><stop offset="1" stop-color="#4aa3ff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><path d="M13 21c7-3 14-2 19 2v27c-5-4-12-5-19-2z" fill="#fff"/><path d="M51 21c-7-3-14-2-19 2v27c5-4 12-5 19-2z" fill="#fff" opacity=".85"/></svg><h1>MMDSAuthor AI</h1></div><select id="lang" style="width:auto"></select></header>
 <p class="sub">Books likhne ka aapka apna AI saathi</p>
 <nav id="nav"></nav><main id="view"></main>
 <script>
@@ -217,15 +222,30 @@ function chars(){
     ['#cn','#cr','#cx'].forEach(s=>$(s).value='');draw()};draw();
 }
 
+const PAPER={bw:0.002252,cream:0.0025,color:0.002347};
 function spine(){
-  $('#view').innerHTML=`<section class="card"><h2>KDP Print Cover Calculator</h2>
-  <label>Trim width (inch)<input id="w" type="number" step="0.01" value="8.5"></label><label>Trim height (inch)<input id="h" type="number" step="0.01" value="11"></label>
-  <label>Pages<input id="pg" type="number" value="120"></label>
-  <label>Paper<select id="pp"><option value="0.002252">Black and white, white paper</option><option value="0.0025">Black and white, cream paper</option><option value="0.002252">Standard colour</option><option value="0.002347">Premium colour</option></select></label>
-  <div id="res" style="margin-top:12px"></div><p class="note">Bleed 0.125 inch har taraf jodi gayi hai. Final size KDP ke Cover Calculator se ek baar match kar lo.</p></section>`;
-  const f=()=>{const w=+$('#w').value,h=+$('#h').value,p=+$('#pg').value,s=p*+$('#pp').value;
-    $('#res').innerHTML=`<div class="big">Spine: ${s.toFixed(3)} in</div><div>Poora cover: ${(2*w+s+0.25).toFixed(3)} x ${(h+0.25).toFixed(3)} in</div><div class="note">Spine par text tab hi rakho jab pages 79 se zyada hon.</div>`};
-  ['#w','#h','#pg','#pp'].forEach(s=>$(s).oninput=f);f();
+  $('#view').innerHTML=`<section class="card"><h2>KDP Cover Wizard</h2>
+  <label>Format<select id="kf"><option value="p">Paperback</option><option value="h">Hardcover</option><option value="e">Ebook (sirf front cover)</option></select></label>
+  <label>Trim size<select id="kt"><option value="5,8">5 x 8 in</option><option value="5.5,8.5">5.5 x 8.5 in</option><option value="6,9" selected>6 x 9 in</option><option value="8,10">8 x 10 in</option><option value="8.5,8.5">8.5 x 8.5 in</option><option value="8.5,11">8.5 x 11 in</option></select></label>
+  <label>Pages<input id="kp" type="number" min="24" value="120"></label>
+  <label>Paper<select id="kpp"><option value="bw">Black and white, white paper</option><option value="cream">Black and white, cream paper</option><option value="color">Colour</option></select></label>
+  <div id="kr" style="margin-top:12px"></div>
+  <p class="note">Ye formula KDP ke mutabik banaye gaye hain, par KDP paper ka factor kabhi badal sakta hai. Final order se pehle KDP ka Cover Calculator se ek baar match karo.</p></section>`;
+  const f=()=>{
+    const [w,h]=$('#kt').value.split(',').map(Number), pg=Math.max(24,+$('#kp').value||24), fm=$('#kf').value;
+    if(fm==='e'){$('#kr').innerHTML='<div class="big">Ebook front cover</div><div>Recommended: 1600 x 2560 px (ratio 1:1.6)</div><div class="note">Ebook mein spine nahi hoti.</div>';return}
+    const sp=pg*PAPER[$('#kpp').value];
+    const wrap=fm==='h'?0.75:0.125;
+    const W=2*w+sp+2*wrap, H=h+2*wrap;
+    $('#kr').innerHTML=`<div class="big">Spine: ${sp.toFixed(3)} in</div>
+      <div>Poora cover (wrap samet): ${W.toFixed(3)} x ${H.toFixed(3)} in</div>
+      <div>Back cover: ${w} in, spine: ${sp.toFixed(3)} in, front cover: ${w} in</div>
+      <div>Barcode box (back cover, neeche right): 2 x 1.2 in</div>
+      <div>Safe area: har taraf kam se kam 0.25 in andar hi text rakho</div>
+      <div class="note">${sp<0.25?'Spine 0.25 in se patli hai, spine par text nahi lagega.':'Spine par text laga sakte ho.'}${fm==='h'?' Hardcover mein wrap margin lagbhag 0.75 in maana gaya hai.':''}</div>`;
+  };
+  ['#kf','#kt','#kp','#kpp'].forEach(x=>{$(x).oninput=f;$(x).onchange=f});
+  f();
 }
 
 function roy(){
@@ -245,4 +265,4 @@ function exp(){
   $('#rs').onclick=()=>{if(confirm('Purana book saaf ho jayega. Pakka?')){B={};save();open('s:research')}};
 }
 open(ls.g('fa_tab','s:research'));
-</script></body></html>
+</script><script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'))}</script></body></html>
