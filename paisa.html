@@ -97,6 +97,12 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
   <label>Mahine ki main income (Rs)</label><input id="pi" type="number" inputmode="numeric">
   <label>Additional income (Rs)</label><input id="pe" type="number" inputmode="numeric">
   <div id="planCats"></div>
+  <div class="c" style="border-style:dashed">
+    <div class="t"><span>Naya additional kharcha</span></div>
+    <label>Naam (jaise Gift, Doctor, Ghar ki repair)</label><input id="anN">
+    <label>Limit (Rs, optional)</label><input id="anL" type="number" inputmode="numeric">
+    <button class="btn" id="anAdd" type="button">Add karo</button>
+  </div>
   <div class="line" style="margin-top:12px"><b>Kul kharch plan</b><b id="pTot">Rs 0</b></div>
   <div class="line"><b>Savings target (income + extra - plan)</b><b id="pSv">Rs 0</b></div>
   <div class="tm" id="pWarn"></div>
@@ -131,7 +137,9 @@ const CATS={
   'Savings':{subs:['Savings','RD monthly investment'],col:'#2e7d32'},
   'Other':{subs:['Other'],col:'#616161'}
 };
-const CN=Object.keys(CATS);
+function allCats(S){return [...Object.keys(CATS),...((S&&S.custom)||[]).map(x=>x.name)]}
+function getSubs(c){return (CATS[c]&&CATS[c].subs)||['General']}
+function colOf(c){return (CATS[c]&&CATS[c].col)||'#455a64'}
 const SAVE_CATS=['Savings'];
 const $=s=>document.getElementById(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -149,7 +157,7 @@ function load(){
 function save(S){try{localStorage.setItem('pp_v2',JSON.stringify(S))}catch{}}
 
 function render(){
-  const S=load();const mk=today().slice(0,7);
+  const S=load();const CN=allCats(S);const mk=today().slice(0,7);
   const month=S.items.filter(x=>x.d.slice(0,7)===mk);
   const of=c=>month.filter(x=>x.c===c).reduce((a,x)=>a+x.amt,0);
   const income=(+S.income||0)+(+S.extra||0);
@@ -182,11 +190,11 @@ function render(){
 }
 
 function fillCats(sel,cur){
-  sel.innerHTML=CN.map(c=>`<option${c===cur?' selected':''}>${c}</option>`).join('');
+  sel.innerHTML=allCats(load()).map(c=>`<option${c===cur?' selected':''}>${c}</option>`).join('');
 }
 function fillSubs(){
   const c=$('sc').value;
-  $('ss').innerHTML=CATS[c].subs.map(x=>`<option>${esc(x)}</option>`).join('');
+  $('ss').innerHTML=getSubs(c).map(x=>`<option>${esc(x)}</option>`).join('');
 }
 let tmr=null,n=30;
 function openAdd(cat){
@@ -205,7 +213,10 @@ $('nHome').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 function openPlan(){
   const S=load();
   $('pi').value=S.income||'';$('pe').value=S.extra||'';
-  $('planCats').innerHTML=CN.map(c=>`<div class="c"><div class="t"><span style="color:${CATS[c].col}">${c}</span><input type="number" inputmode="numeric" data-c="${c}" value="${S.plan[c]||''}" placeholder="Rs"></div><div class="sub">${CATS[c].subs.map(esc).join(' · ')}</div></div>`).join('');
+  $('planCats').innerHTML=allCats(S).map(c=>{
+    const cus=(S.custom||[]).some(x=>x.name===c);
+    return `<div class="c"><div class="t"><span style="color:${colOf(c)}">${esc(c)}${cus?'<span class="tag">Additional</span>':''}</span><span style="display:flex;gap:6px;align-items:center"><input type="number" inputmode="numeric" data-c="${esc(c)}" value="${S.plan[c]||''}" placeholder="Rs" style="width:110px">${cus?`<button class="sec" data-rm="${esc(c)}" style="padding:6px 8px">Hatao</button>`:''}</span></div><div class="sub">${getSubs(c).map(esc).join(' · ')}</div></div>`;
+  }).join('');
   calcPlan();
   $('planSheet').classList.add('on');
 }
@@ -221,6 +232,24 @@ $('nSet').onclick=openPlan;$('qPlan').onclick=openPlan;
 $('pi').oninput=calcPlan;$('pe').oninput=calcPlan;
 $('planCats').oninput=calcPlan;
 $('pClose').onclick=()=>$('planSheet').classList.remove('on');
+$('anAdd').onclick=()=>{
+  const name=$('anN').value.trim();
+  if(!name){alert('Naam likho');return}
+  const S=load();S.custom=S.custom||[];
+  if(allCats(S).includes(name)){alert('Ye category pehle se hai');return}
+  S.custom.push({name:name});
+  if($('anL').value)S.plan[name]=$('anL').value;
+  save(S);$('anN').value='';$('anL').value='';
+  openPlan();render();
+};
+$('planCats').addEventListener('click',e=>{
+  const rm=e.target&&e.target.dataset&&e.target.dataset.rm;
+  if(!rm)return;
+  const S=load();
+  S.custom=(S.custom||[]).filter(x=>x.name!==rm);
+  delete S.plan[rm];
+  save(S);openPlan();render();
+});
 $('pSave').onclick=()=>{
   const S=load();S.income=$('pi').value;S.extra=$('pe').value;S.plan={};
   document.querySelectorAll('#planCats [data-c]').forEach(i=>{if(i.value)S.plan[i.dataset.c]=i.value});
