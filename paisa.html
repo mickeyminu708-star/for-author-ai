@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="hi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Paisa Pehredar</title>
+<meta name="theme-color" content="#0b5d3b">
+<link rel="manifest" href="/manifest-paisa.json">
+<link rel="icon" href="/icon-paisa-192.png" type="image/png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Paisa Pehredar">
+<style>
+:root{--g1:#0b5d3b;--g2:#16a05f;--bg:#f2f6f4;--card:#fff;--tx:#14241d;--mu:#6b7d74;--red:#c62828;--amb:#d98e04;--line:#e1ebe6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,Roboto,sans-serif;padding-bottom:86px}
+.top{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;padding:22px 18px 70px;border-radius:0 0 28px 28px}
+.top .hi{opacity:.85;font-size:13px}.top h1{margin:4px 0 0;font-size:22px}
+.wrap{margin:-52px 14px 0}
+.bal{background:var(--card);border-radius:20px;padding:18px;box-shadow:0 8px 24px rgba(11,93,59,.15)}
+.bal .lbl{color:var(--mu);font-size:13px}.bal .amt{font-size:30px;font-weight:700;margin:2px 0 10px}
+.bar{height:10px;background:var(--line);border-radius:10px;overflow:hidden}.bar i{display:block;height:100%;background:var(--g2);border-radius:10px}
+.row2{display:flex;justify-content:space-between;margin-top:12px;font-size:13px;color:var(--mu)}
+.quick{display:flex;gap:10px;margin:16px 14px 0}
+.quick button{flex:1;background:var(--card);border:0;border-radius:16px;padding:14px 8px;font:inherit;font-size:13px;color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.quick b{display:block;font-size:20px;color:var(--g1);margin-bottom:2px}
+.sec{margin:18px 14px 0;background:var(--card);border-radius:18px;padding:14px 16px}
+.sec h3{margin:0 0 10px;font-size:15px}
+.cat{margin:10px 0}.cat .h{display:flex;justify-content:space-between;font-size:14px}.cat .bar{margin-top:5px;height:7px}
+.tx{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.tx:last-child{border:0}.tx .n{font-weight:600}.tx .s{font-size:12px;color:var(--mu)}
+.tx .a{font-weight:700;color:var(--red)}.tx .a.g{color:var(--g2)}
+.tx button{border:0;background:none;color:var(--mu);font-size:12px;padding:4px}
+.warn{margin:14px 14px 0;padding:12px 14px;border-radius:14px;font-size:14px}
+.warn.r{background:#fde8e8;color:#8a1212}.warn.a{background:#fff4d6;color:#6b4d00}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;display:flex;justify-content:space-around;padding:10px 0 calc(10px + env(safe-area-inset-bottom));box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+.nav button{border:0;background:none;font:inherit;font-size:12px;color:var(--mu);display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button b{font-size:18px}
+.nav .plus{background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff;border-radius:50%;width:50px;height:50px;justify-content:center;margin-top:-26px;box-shadow:0 6px 16px rgba(22,160,95,.4)}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-end;z-index:9}
+.sheet.on{display:flex}
+.sheet .box{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto}
+.sheet h2{margin:0 0 12px;font-size:18px}
+label{display:block;font-size:13px;color:var(--mu);margin:10px 0 3px}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px;font:inherit;background:#fff;color:var(--tx)}
+.btn{width:100%;border:0;border-radius:14px;padding:14px;font:inherit;font-weight:600;margin-top:12px;background:linear-gradient(135deg,var(--g1),var(--g2));color:#fff}
+.btn.ghost{background:var(--bg);color:var(--tx)}.btn:disabled{opacity:.5}
+.tm{margin-top:12px;padding:12px;border-radius:14px;background:#fff4d6;color:#6b4d00;font-size:14px;display:none}
+.empty{color:var(--mu);font-size:14px;text-align:center;padding:14px 0}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;background:var(--line);color:var(--mu);margin-left:6px}
+.plan .c{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px}
+.plan .c .t{display:flex;justify-content:space-between;align-items:center;font-weight:600}
+.plan .c .t input{width:120px}
+.plan .c .sub{font-size:12px;color:var(--mu);margin-top:4px}
+.line{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+</style></head><body>
+<div class="top"><div class="hi">Namaste</div><h1>Paisa Pehredar</h1></div>
+<div class="wrap">
+  <div class="bal">
+    <div class="lbl">Is mahine ka bacha hua (budget ke hisaab se)</div>
+    <div class="amt" id="left">Rs 0</div>
+    <div class="bar"><i id="barFill" style="width:0%"></i></div>
+    <div class="row2"><span>Kharch: <b id="spent">Rs 0</b></span><span>Plan: <b id="planT">Rs 0</b></span></div>
+    <div class="row2"><span>Income: <b id="inc">Rs 0</b></span><span>Savings target: <b id="svT">Rs 0</b></span></div>
+    <div class="row2"><span>Savings abhi tak: <b id="saved">Rs 0</b></span><span id="mon"></span></div>
+  </div>
+</div>
+<div id="warn"></div>
+<div class="quick">
+  <button id="qAdd"><b>+</b>Naya kharcha</button>
+  <button id="qPlan"><b>&#9998;</b>Budget plan</button>
+  <button id="qImp"><b>&#8681;</b>Statement</button>
+  <button id="qCsv"><b>&#8659;</b>Report</button>
+</div>
+<div class="sec"><h3>UPI se pehle check karo</h3><p class="note" style="margin:0 0 6px">Payment karne se pehle category ka bacha hua dekh lo. Limit paar ho to ruko.</p><div id="cats"></div></div>
+<div class="sec"><h3>Is mahine ke transactions</h3><div id="list"></div></div>
+<div class="nav">
+  <button id="nHome"><b>&#8962;</b>Home</button>
+  <button id="nAdd" class="plus"><b>+</b></button>
+  <button id="nSet"><b>&#9881;</b>Plan</button>
+</div>
+
+<div class="sheet" id="sheet"><div class="box">
+  <h2>Naya kharcha / bachat</h2>
+  <label>Tareekh</label><input id="sd" type="date">
+  <label>Category</label><select id="sc"></select>
+  <label>Sub-category</label><select id="ss"></select>
+  <label>Raqam (Rs)</label><input id="sa" type="number" inputmode="numeric" placeholder="jaise 1500">
+  <label>Kisko / kahan</label><input id="sw" placeholder="jaise Big Bazaar, BESCOM">
+  <label>Note (optional)</label><input id="sn">
+  <div class="tm" id="tm"></div>
+  <button class="btn" id="sg">Save karne se pehle ruko</button>
+  <button class="btn" id="sok" style="display:none">Pakka save karo</button>
+  <button class="btn ghost" id="sx">Band karo</button>
+</div></div>
+
+<div class="sheet" id="planSheet"><div class="box">
+  <h2>Monthly budget plan</h2>
+  <p class="note" style="margin:0 0 4px">Har category ki limit daalo. Khaali chhodne par us category ki limit nahi hogi.</p>
+  <label>Mahine ki main income (Rs)</label><input id="pi" type="number" inputmode="numeric">
+  <label>Additional income (Rs)</label><input id="pe" type="number" inputmode="numeric">
+  <div id="planCats"></div>
+  <div class="line" style="margin-top:12px"><b>Kul kharch plan</b><b id="pTot">Rs 0</b></div>
+  <div class="line"><b>Savings target (income + extra - plan)</b><b id="pSv">Rs 0</b></div>
+  <div class="tm" id="pWarn"></div>
+  <button class="btn" id="pSave">Plan save karo</button>
+  <button class="btn ghost" id="pClose">Band karo</button>
+</div></div>
+
+<div class="sheet" id="impSheet"><div class="box">
+  <h2>Bank statement se kharcha</h2>
+  <p class="note" style="margin:0 0 6px">CSV file chuno. File sirf is phone mein padhi jayegi, kahin upload nahi hogi. Credit (paisa aaya) entries skip ho jayengi.</p>
+  <input id="imf" type="file" accept=".csv,text/csv,text/plain">
+  <div id="impMap" style="display:none">
+    <label>Date column</label><select id="mD"></select>
+    <label>Description / naam column</label><select id="mN"></select>
+    <label>Debit (kharcha) column</label><select id="mDr"></select>
+    <label>Credit column (optional)</label><select id="mCr"></select>
+    <div class="note" id="impCount" style="margin-top:8px"></div>
+    <button class="btn" id="impGo">Import karo</button>
+  </div>
+  <div class="tm" id="impMsg"></div>
+  <button class="btn ghost" id="impX">Band karo</button>
+</div></div>
+
+<script>
+const CATS={
+  'Ghar':{subs:['Grocery','Light bill','Water bill / Maintenance'],col:'#0b5d3b'},
+  'Education':{subs:['School fees','Stationery','Notebooks','Tuition fees','Other education'],col:'#1565c0'},
+  'Transport':{subs:['Vehicle maintenance','Diesel / Petrol / CNG','Taxi / Ola / Uber / Rapido','Bus / Railway','Pass (monthly / quarterly / yearly)','Private car'],col:'#6a1b9a'},
+  'Value services':{subs:['Value services'],col:'#00838f'},
+  'Phone & Internet':{subs:['Mobile','Internet / WiFi','TV / Cable'],col:'#ef6c00'},
+  'Insurance & EMI':{subs:['Insurance','Term plan','Mutual fund','Bank EMI'],col:'#ad1457'},
+  'Savings':{subs:['Savings','RD monthly investment'],col:'#2e7d32'},
+  'Other':{subs:['Other'],col:'#616161'}
+};
+const CN=Object.keys(CATS);
+const SAVE_CATS=['Savings'];
+const $=s=>document.getElementById(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rs=v=>'Rs '+Math.round(v||0).toLocaleString('en-IN');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+
+function load(){
+  try{const v=JSON.parse(localStorage.getItem('pp_v2'));if(v)return v}catch{}
+  // purane Spending Guard ka data ek baar copy karo
+  let old={};try{old=JSON.parse(localStorage.getItem('fa_spend'))||{}}catch{}
+  const map={'Ghar':'Ghar','EMI':'Insurance & EMI','Bachhe ki padhai':'Education','Bachat':'Savings','Other':'Other'};
+  const items=(old.items||[]).map(x=>({id:x.id,d:x.d,amt:x.amt,to:x.to,c:map[x.c]||'Other',s:'',n:x.n||''}));
+  return {income:'',extra:'',plan:{},items};
+}
+function save(S){try{localStorage.setItem('pp_v2',JSON.stringify(S))}catch{}}
+
+function render(){
+  const S=load();const mk=today().slice(0,7);
+  const month=S.items.filter(x=>x.d.slice(0,7)===mk);
+  const of=c=>month.filter(x=>x.c===c).reduce((a,x)=>a+x.amt,0);
+  const income=(+S.income||0)+(+S.extra||0);
+  const planExp=CN.filter(c=>!SAVE_CATS.includes(c)).reduce((a,c)=>a+(+S.plan[c]||0),0);
+  const savingsTarget=Math.max(0,income-planExp-(+S.plan['Savings']||0));
+  const spent=month.filter(x=>!SAVE_CATS.includes(x.c)).reduce((a,x)=>a+x.amt,0);
+  const saved=month.filter(x=>SAVE_CATS.includes(x.c)).reduce((a,x)=>a+x.amt,0);
+  const left=planExp-spent;
+  const pct=planExp?Math.min(100,spent/planExp*100):0;
+  $('left').textContent=planExp?rs(left):'Plan banao';
+  $('spent').textContent=rs(spent);
+  $('planT').textContent=rs(planExp);
+  $('inc').textContent=rs(income);
+  $('svT').textContent=rs(savingsTarget);
+  $('saved').textContent=rs(saved);
+  $('mon').textContent=new Date().toLocaleString('hi-IN',{month:'long'});
+  $('barFill').style.width=pct+'%';
+  $('barFill').style.background=pct>=100?'var(--red)':pct>=80?'var(--amb)':'var(--g2)';
+  $('warn').innerHTML=!planExp?'':pct>=100?`<div class="warn r">Plan ki limit khatam. Aage ka kharcha ruk kar socho.</div>`:pct>=80?`<div class="warn a">${pct.toFixed(0)}% plan kharch ho chuka hai.</div>`:'';
+  $('cats').innerHTML=CN.filter(c=>!SAVE_CATS.includes(c)).map(c=>{
+    const lim=+S.plan[c]||0;const v=of(c);
+    if(!lim)return `<div class="cat"><div class="h"><span>${c}</span><b>${rs(v)}</b></div></div>`;
+    const p=Math.min(100,v/lim*100);const rem=lim-v;
+    const col=p>=100?'var(--red)':p>=80?'var(--amb)':'var(--g2)';
+    return `<div class="cat"><div class="h"><span>${c}</span><b style="color:${rem<0?'var(--red)':'inherit'}">${rem<0?'Limit paar: '+rs(-rem):'Bacha: '+rs(rem)}</b></div><div class="bar"><i style="width:${p}%;background:${col}"></i></div><div class="note" style="font-size:12px;color:var(--mu)">${rs(v)} / ${rs(lim)}</div></div>`;
+  }).join('');
+  const list=month.slice().sort((a,b)=>b.d.localeCompare(a.d));
+  $('list').innerHTML=list.length?list.map(x=>`<div class="tx"><div><div class="n">${esc(x.to)}</div><div class="s">${esc(x.c)}${x.s?' · '+esc(x.s):''} · ${x.d}</div></div><div style="text-align:right"><div class="a ${SAVE_CATS.includes(x.c)?'g':''}">${SAVE_CATS.includes(x.c)?'+':'-'}${rs(x.amt)}</div><button data-id="${x.id}">Hatao</button></div></div>`).join(''):'<div class="empty">Is mahine koi entry nahi</div>';
+  document.querySelectorAll('#list [data-id]').forEach(b=>b.onclick=()=>{const T=load();T.items=T.items.filter(i=>String(i.id)!==b.dataset.id);save(T);render()});
+}
+
+function fillCats(sel,cur){
+  sel.innerHTML=CN.map(c=>`<option${c===cur?' selected':''}>${c}</option>`).join('');
+}
+function fillSubs(){
+  const c=$('sc').value;
+  $('ss').innerHTML=CATS[c].subs.map(x=>`<option>${esc(x)}</option>`).join('');
+}
+let tmr=null,n=30;
+function openAdd(cat){
+  $('sd').value=today();$('sa').value='';$('sw').value='';$('sn').value='';
+  fillCats($('sc'),cat||'Ghar');fillSubs();
+  $('sg').style.display='';$('sg').disabled=false;$('sok').style.display='none';$('tm').style.display='none';
+  $('sheet').classList.add('on');
+}
+function closeAdd(){clearInterval(tmr);$('sheet').classList.remove('on')}
+$('sc').onchange=fillSubs;
+$('qAdd').onclick=()=>openAdd('Ghar');
+$('nAdd').onclick=()=>openAdd('Ghar');
+$('sx').onclick=closeAdd;
+$('nHome').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+function openPlan(){
+  const S=load();
+  $('pi').value=S.income||'';$('pe').value=S.extra||'';
+  $('planCats').innerHTML=CN.map(c=>`<div class="c"><div class="t"><span style="color:${CATS[c].col}">${c}</span><input type="number" inputmode="numeric" data-c="${c}" value="${S.plan[c]||''}" placeholder="Rs"></div><div class="sub">${CATS[c].subs.map(esc).join(' · ')}</div></div>`).join('');
+  calcPlan();
+  $('planSheet').classList.add('on');
+}
+function calcPlan(){
+  const inc=(+$('pi').value||0)+(+$('pe').value||0);
+  let tot=0;document.querySelectorAll('#planCats [data-c]').forEach(i=>{if(!SAVE_CATS.includes(i.dataset.c))tot+=(+i.value||0)});
+  const sv=Math.max(0,inc-tot-(+(document.querySelector('#planCats [data-c="Savings"]')?.value)||0));
+  $('pTot').textContent=rs(tot);$('pSv').textContent=rs(sv);
+  $('pWarn').style.display=inc&&tot>inc?'block':'none';
+  $('pWarn').textContent=inc&&tot>inc?'Plan income se zyada hai. Kuch limit kam karo.':'';
+}
+$('nSet').onclick=openPlan;$('qPlan').onclick=openPlan;
+$('pi').oninput=calcPlan;$('pe').oninput=calcPlan;
+$('planCats').oninput=calcPlan;
+$('pClose').onclick=()=>$('planSheet').classList.remove('on');
+$('pSave').onclick=()=>{
+  const S=load();S.income=$('pi').value;S.extra=$('pe').value;S.plan={};
+  document.querySelectorAll('#planCats [data-c]').forEach(i=>{if(i.value)S.plan[i.dataset.c]=i.value});
+  save(S);$('planSheet').classList.remove('on');render();
+};
+
+$('qCsv').onclick=()=>{
+  const S=load();const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const rows=[['Tareekh','Category','Sub-category','Raqam','Kisko','Note'].join(',')].concat(S.items.map(x=>[x.d,x.c,x.s,x.amt,x.to,x.n].map(q).join(',')));
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download='paisa-pehredar.csv';a.click();
+};
+
+$('sg').onclick=()=>{
+  const amt=+$('sa').value;
+  if(!(amt>0)){alert('Raqam daalo');return}
+  if(!$('sw').value.trim()){alert('Kisko / kahan likho');return}
+  const cat=$('sc').value;const S=load();
+  const lim=+S.plan[cat]||0;
+  const used=S.items.filter(x=>x.c===cat&&x.d.slice(0,7)===today().slice(0,7)).reduce((a,x)=>a+x.amt,0);
+  const over=lim&&(used+amt>lim);
+  n=30;$('sg').disabled=true;$('tm').style.display='block';
+  const tick=()=>{
+    if(n>0){$('tm').textContent=`Ruko! ${n} second baad save hoga.${over?' Ye ' + cat + ' ki limit se Rs '+Math.round(used+amt-lim)+' zyada hoga. Kya ye zaroori hai?':''}`;n--;return}
+    clearInterval(tmr);
+    $('tm').textContent=over?'Limit paar ho rahi hai. Phir bhi save karna hai to niche dabao.':'Ab soch lo. Save karna hai to niche dabao.';
+    $('sok').style.display='block';$('sg').style.display='none';
+  };
+  tick();tmr=setInterval(tick,1000);
+};
+$('sok').onclick=()=>{
+  const amt=+$('sa').value;if(!(amt>0))return;
+  const S=load();
+  S.items.push({id:Date.now(),d:$('sd').value||today(),amt:amt,to:$('sw').value.trim(),c:$('sc').value,s:$('ss').value,n:$('sn').value.trim()});
+  save(S);closeAdd();render();
+};
+
+// ---- Bank statement import (CSV, sirf is phone mein) ----
+function csvParse(text){
+  const first=text.split(/\r?\n/)[0]||'';
+  const delim=(first.split(';').length>first.split(',').length)?';':(first.split('\t').length>first.split(',').length?'\t':',');
+  const rows=[];let row=[],cell='',q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){
+      if(ch==='"'&&text[i+1]==='"'){cell+='"';i++}
+      else if(ch==='"'){q=false}
+      else cell+=ch;
+    } else {
+      if(ch==='"')q=true;
+      else if(ch===delim){row.push(cell.trim());cell=''}
+      else if(ch==='\n'){row.push(cell.trim());rows.push(row);row=[];cell=''}
+      else if(ch!=='\r')cell+=ch;
+    }
+  }
+  if(cell||row.length){row.push(cell.trim());rows.push(row)}
+  return rows.filter(r=>r.some(x=>x!==''));
+}
+function impDate(v){
+  v=String(v||'').trim();let m;
+  if(m=v.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/))return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  if(m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/)){let y=m[3];if(y.length===2)y='20'+y;return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`}
+  return '';
+}
+function impNum(v){const n=Number(String(v||'').replace(/[^0-9.\-]/g,''));return isNaN(n)?0:Math.abs(n)}
+function guessCat(desc){
+  const d=(desc||'').toLowerCase();
+  const rules=[
+    [/emi|loan|insurance|lic|term|mutual|sip|mf|bajaj|hdfc life/,'Insurance & EMI'],
+    [/school|college|fees|tuition|stationer|book|edu/,'Education'],
+    [/petrol|diesel|cng|fuel|uber|ola|rapido|taxi|metro|railway|irctc|bus|fastag|parking/,'Transport'],
+    [/bescom|electric|power|water|gas|grocer|kirana|bigbasket|blinkit|zepto|dmart|vegetable|milk|maint/,'Ghar'],
+    [/airtel|jio|vi |vodafone|bsnl|wifi|broadband|dth|tata sky|cable|netflix|prime/,'Phone & Internet'],
+    [/rd |recurring|saving|fd /,'Savings']
+  ];
+  for(const [re,c] of rules)if(re.test(d))return c;
+  return 'Other';
+}
+function impHeaders(hdr){
+  const pick=(re,def)=>{const i=hdr.findIndex(h=>re.test(h.toLowerCase()));return i>=0?i:def};
+  return {d:pick(/date|tarikh|txn date|value date/,0),n:pick(/narr|desc|particular|detail|naam|remark/,1),dr:pick(/debit|withdraw|dr|kharch/,2),cr:pick(/credit|deposit|cr|jama/,-1)};
+}
+let impRows=[],impHdr=[];
+function openImp(){$('impMsg').style.display='none';$('impMap').style.display='none';$('imf').value='';$('impSheet').classList.add('on')}
+$('qImp').onclick=openImp;
+$('impX').onclick=()=>$('impSheet').classList.remove('on');
+$('imf').onchange=()=>{
+  const f=$('imf').files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const all=csvParse(String(rd.result||''));
+    if(all.length<2){$('impMsg').style.display='block';$('impMsg').textContent='File mein data nahi mila. Bank ka CSV export check karo.';return}
+    impHdr=all[0];impRows=all.slice(1);
+    const g=impHeaders(impHdr);
+    const opts=(sel,val,allowNone)=>{
+      sel.innerHTML=(allowNone?'<option value="-1">(koi nahi)</option>':'')+impHdr.map((h,i)=>`<option value="${i}"${i===val?' selected':''}>${esc(h||('Column '+(i+1)))}</option>`).join('');
+    };
+    opts($('mD'),g.d,false);opts($('mN'),g.n,false);opts($('mDr'),g.dr,false);opts($('mCr'),g.cr,true);
+    $('impMap').style.display='block';
+    updCount();
+  };
+  rd.readAsText(f);
+};
+function updCount(){
+  const di=+$('mD').value,dr=+$('mDr').value;
+  const ok=impRows.filter(r=>impDate(r[di])&&impNum(r[dr])>0).length;
+  $('impCount').textContent=`${impRows.length} lines mein se ${ok} kharche ban sakte hain.`;
+}
+['mD','mN','mDr','mCr'].forEach(id=>$(id).onchange=updCount);
+$('impGo').onclick=()=>{
+  const di=+$('mD').value,ni=+$('mN').value,dr=+$('mDr').value,cr=+$('mCr').value;
+  const S=load();const have=new Set(S.items.map(x=>x.id));
+  let added=0,skipped=0,dup=0;
+  impRows.forEach(r=>{
+    const d=impDate(r[di]);const amt=impNum(r[dr]);
+    if(!d||amt<=0){skipped++;return}
+    if(cr>=0&&impNum(r[cr])>0){skipped++;return}
+    const desc=(r[ni]||'').replace(/\s+/g,' ').trim();
+    const id='imp'+d+'|'+amt+'|'+desc.slice(0,40);
+    if(have.has(id)){dup++;return}
+    have.add(id);
+    S.items.push({id:id,d:d,amt:amt,to:desc||'Bank entry',c:guessCat(desc),s:'',n:'Bank statement se'});
+    added++;
+  });
+  save(S);
+  $('impMsg').style.display='block';
+  $('impMsg').textContent=`${added} kharche jod diye. ${dup} pehle se the. ${skipped} skip hue. Category galat lage to entry par category badal sakte ho (abhi Hatao karke dobara daalo).`;
+  render();
+};
+render();
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'))}
+</script></body></html>
