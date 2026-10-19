@@ -51,10 +51,10 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
 .plan .c .sub{font-size:12px;color:var(--mu);margin-top:4px}
 .line{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
 </style></head><body>
-<div class="top"><div class="hi">Namaste</div><h1>Paisa Pehredar</h1></div>
+<div class="top"><div class="hi" data-t="hi">Namaste</div><h1>Paisa Pehredar</h1><select id="lg" style="margin-top:8px;width:auto;max-width:100%;border-radius:10px;padding:6px 8px;font-size:13px;background:rgba(255,255,255,.2);color:#fff;border:0"></select></div>
 <div class="wrap">
   <div class="bal">
-    <div class="lbl">Is mahine ka bacha hua (budget ke hisaab se)</div>
+    <div class="lbl" data-t="balLbl">Is mahine ka bacha hua (budget ke hisaab se)</div>
     <div class="amt" id="left">Rs 0</div>
     <div class="bar"><i id="barFill" style="width:0%"></i></div>
     <div class="row2"><span>Kharch: <b id="spent">Rs 0</b></span><span>Plan: <b id="planT">Rs 0</b></span></div>
@@ -64,13 +64,14 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
 </div>
 <div id="warn"></div>
 <div class="quick">
-  <button id="qAdd"><b>+</b>Naya kharcha</button>
-  <button id="qPlan"><b>&#9998;</b>Budget plan</button>
-  <button id="qImp"><b>&#8681;</b>Statement</button>
-  <button id="qCsv"><b>&#8659;</b>Report</button>
+  <button id="qAdd"><b>+</b><span data-t="qAdd">Naya kharcha</span></button>
+  <button id="qPlan"><b>&#9998;</b><span data-t="qPlan">Budget plan</span></button>
+  <button id="qImp"><b>&#8681;</b><span data-t="qImp">Statement</span></button>
+  <button id="qAi"><b>&#10024;</b><span>AI summary</span></button>
+  <button id="qCsv"><b>&#8659;</b><span data-t="qCsv">Report</span></button>
 </div>
-<div class="sec"><h3>UPI se pehle check karo</h3><p class="note" style="margin:0 0 6px">Payment karne se pehle category ka bacha hua dekh lo. Limit paar ho to ruko.</p><div id="cats"></div></div>
-<div class="sec"><h3>Is mahine ke transactions</h3><div id="list"></div></div>
+<div class="sec"><h3 data-t="chkT">UPI se pehle check karo</h3><p class="note" style="margin:0 0 6px">Payment karne se pehle category ka bacha hua dekh lo. Limit paar ho to ruko.</p><div id="cats"></div></div>
+<div class="sec"><h3 data-t="txT">Is mahine ke transactions</h3><div id="list"></div></div>
 <div class="nav">
   <button id="nHome"><b>&#8962;</b>Home</button>
   <button id="nAdd" class="plus"><b>+</b></button>
@@ -78,7 +79,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
 </div>
 
 <div class="sheet" id="sheet"><div class="box">
-  <h2>Naya kharcha / bachat</h2>
+  <h2 data-t="addT">Naya kharcha / bachat</h2>
   <label>Tareekh</label><input id="sd" type="date">
   <label>Category</label><select id="sc"></select>
   <label>Sub-category</label><select id="ss"></select>
@@ -86,32 +87,40 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
   <label>Kisko / kahan</label><input id="sw" placeholder="jaise Big Bazaar, BESCOM">
   <label>Note (optional)</label><input id="sn">
   <div class="tm" id="tm"></div>
-  <button class="btn" id="sg">Save karne se pehle ruko</button>
-  <button class="btn" id="sok" style="display:none">Pakka save karo</button>
-  <button class="btn ghost" id="sx">Band karo</button>
+  <button class="btn" id="sg" data-t="sgB">Save karne se pehle ruko</button>
+  <button class="btn" id="sok" style="display:none" data-t="sokB">Pakka save karo</button>
+  <button class="btn ghost" id="sx" data-t="close">Band karo</button>
 </div></div>
 
 <div class="sheet" id="planSheet"><div class="box">
-  <h2>Monthly budget plan</h2>
+  <h2 data-t="planT">Monthly budget plan</h2>
   <p class="note" style="margin:0 0 4px">Har category ki limit daalo. Khaali chhodne par us category ki limit nahi hogi.</p>
-  <label>Mahine ki main income (Rs)</label><input id="pi" type="number" inputmode="numeric">
-  <label>Additional income (Rs)</label><input id="pe" type="number" inputmode="numeric">
+  <label data-t="incL">Mahine ki main income (Rs)</label><input id="pi" type="number" inputmode="numeric">
+  <label data-t="exL">Additional income (Rs)</label><input id="pe" type="number" inputmode="numeric">
   <div id="planCats"></div>
   <div class="c" style="border-style:dashed">
-    <div class="t"><span>Naya additional kharcha</span></div>
-    <label>Naam (jaise Gift, Doctor, Ghar ki repair)</label><input id="anN">
-    <label>Limit (Rs, optional)</label><input id="anL" type="number" inputmode="numeric">
-    <button class="btn" id="anAdd" type="button">Add karo</button>
+    <div class="t"><span data-t="anT">Naya additional kharcha</span></div>
+    <label data-t="anNL">Naam (jaise Gift, Doctor, Ghar ki repair)</label><input id="anN">
+    <label data-t="anLL">Limit (Rs, optional)</label><input id="anL" type="number" inputmode="numeric">
+    <button class="btn" id="anAdd" type="button" data-t="anB">Add karo</button>
   </div>
-  <div class="line" style="margin-top:12px"><b>Kul kharch plan</b><b id="pTot">Rs 0</b></div>
-  <div class="line"><b>Savings target (income + extra - plan)</b><b id="pSv">Rs 0</b></div>
+  <div class="line" style="margin-top:12px"><b data-t="totL">Kul kharch plan</b><b id="pTot">Rs 0</b></div>
+  <div class="line"><b data-t="svL">Savings target (income + extra - plan)</b><b id="pSv">Rs 0</b></div>
   <div class="tm" id="pWarn"></div>
-  <button class="btn" id="pSave">Plan save karo</button>
-  <button class="btn ghost" id="pClose">Band karo</button>
+  <button class="btn" id="pSave" data-t="pSaveB">Plan save karo</button>
+  <button class="btn ghost" id="pClose" data-t="close">Band karo</button>
+</div></div>
+
+<div class="sheet" id="aiSheet"><div class="box">
+  <h2>Is mahine ka AI summary</h2>
+  <p class="note" style="margin:0 0 6px">Sirf category ke total aur plan ke numbers AI ko jaate hain. Dukaan ya vyakti ke naam nahi.</p>
+  <div id="aiOut" class="msg" style="white-space:pre-wrap;line-height:1.6">Ruko, summary ban raha hai...</div>
+  <button class="btn" id="aiAgain">Dobara banao</button>
+  <button class="btn ghost" id="aiX" data-t="close">Band karo</button>
 </div></div>
 
 <div class="sheet" id="impSheet"><div class="box">
-  <h2>Bank statement se kharcha</h2>
+  <h2 data-t="impT">Bank statement se kharcha</h2>
   <p class="note" style="margin:0 0 6px">CSV file chuno. File sirf is phone mein padhi jayegi, kahin upload nahi hogi. Credit (paisa aaya) entries skip ho jayengi.</p>
   <input id="imf" type="file" accept=".csv,text/csv,text/plain">
   <div id="impMap" style="display:none">
@@ -123,7 +132,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
     <button class="btn" id="impGo">Import karo</button>
   </div>
   <div class="tm" id="impMsg"></div>
-  <button class="btn ghost" id="impX">Band karo</button>
+  <button class="btn ghost" id="impX" data-t="close">Band karo</button>
 </div></div>
 
 <script>
@@ -137,6 +146,36 @@ const CATS={
   'Savings':{subs:['Savings','RD monthly investment'],col:'#2e7d32'},
   'Other':{subs:['Other'],col:'#616161'}
 };
+
+const TR={
+ en:{hi:'Namaste',balLbl:'Is month ka bacha hua (budget ke hisaab se)',qAdd:'New expense',qPlan:'Budget plan',qImp:'Statement',qCsv:'Report',chkT:'Check before UPI',txT:'This month\'s transactions',addT:'New expense / saving',sgB:'Wait before saving',sokB:'Save now',close:'Close',planT:'Monthly budget plan',incL:'Main monthly income (Rs)',exL:'Extra income (Rs)',anT:'New extra expense',anNL:'Name (e.g. Gift, Doctor, House repair)',anLL:'Limit (Rs, optional)',anB:'Add',totL:'Total expense plan',svL:'Savings target (income + extra - plan)',pSaveB:'Save plan',impT:'Expense from bank statement'},
+ hi:{hi:'नमस्ते',balLbl:'इस महीने का बचा हुआ (बजट के हिसाब से)',qAdd:'नया खर्च',qPlan:'बजट प्लान',qImp:'स्टेटमेंट',qCsv:'रिपोर्ट',chkT:'UPI से पहले देखें',txT:'इस महीने के लेन-देन',addT:'नया खर्च / बचत',sgB:'सेव करने से पहले रुकें',sokB:'अभी सेव करें',close:'बंद करें',planT:'मासिक बजट प्लान',incL:'मुख्य मासिक आय (रु)',exL:'अतिरिक्त आय (रु)',anT:'नया अतिरिक्त खर्च',anNL:'नाम (जैसे गिफ्ट, डॉक्टर, घर की मरम्मत)',anLL:'सीमा (रु, वैकल्पिक)',anB:'जोड़ें',totL:'कुल खर्च प्लान',svL:'बचत लक्ष्य (आय + अतिरिक्त - प्लान)',pSaveB:'प्लान सेव करें',impT:'बैंक स्टेटमेंट से खर्च'},
+ hn:{hi:'Namaste',balLbl:'Is mahine ka bacha hua (budget ke hisaab se)',qAdd:'Naya kharcha',qPlan:'Budget plan',qImp:'Statement',qCsv:'Report',chkT:'UPI se pehle check karo',txT:'Is mahine ke transactions',addT:'Naya kharcha / bachat',sgB:'Save karne se pehle ruko',sokB:'Abhi save karo',close:'Band karo',planT:'Monthly budget plan',incL:'Main monthly income (Rs)',exL:'Additional income (Rs)',anT:'Naya additional kharcha',anNL:'Naam (jaise Gift, Doctor, Ghar ki repair)',anLL:'Limit (Rs, optional)',anB:'Add karo',totL:'Kul kharch plan',svL:'Savings target (income + extra - plan)',pSaveB:'Plan save karo',impT:'Bank statement se kharcha'}
+};
+
+const LANGS=[['hn','Hinglish'],['en','English'],['hi','हिन्दी'],['bn','বাংলা'],['mr','मराठी'],['te','తెలుగు'],['ta','தமிழ்'],['gu','ગુજરાતી'],['kn','ಕನ್ನಡ'],['ml','മലയാളം'],['pa','ਪੰਜਾਬੀ'],['ur','اردو'],['or','ଓଡ଼ିଆ'],['as','অসমীয়া'],['ne','नेपाली'],['sa','संस्कृतम्'],['kok','कोंकणी'],['mai','मैथिली'],['doi','डोगरी'],['mni','মৈতৈলোন্'],['brx','बड़ो'],['sat','ᱥᱟᱱᱛᱟᱲᱤ'],['ks','کٲشُر'],['sd','سنڌي']];
+const TR_BN={hi:'নমস্কার',balLbl:'এই মাসে যা বাকি আছে (বাজেট অনুযায়ী)',qAdd:'নতুন খরচ',qPlan:'বাজেট প্ল্যান',qImp:'স্টেটমেন্ট',qCsv:'রিপোর্ট',chkT:'UPI-র আগে দেখুন',txT:'এই মাসের লেনদেন',addT:'নতুন খরচ / সঞ্চয়',sgB:'সেভ করার আগে অপেক্ষা করুন',sokB:'এখন সেভ করুন',close:'বন্ধ করুন',planT:'মাসিক বাজেট প্ল্যান',incL:'মূল মাসিক আয় (টাকা)',exL:'অতিরিক্ত আয় (টাকা)',anT:'নতুন অতিরিক্ত খরচ',anNL:'নাম (যেমন উপহার, ডাক্তার, বাড়ি মেরামত)',anLL:'সীমা (টাকা, ঐচ্ছিক)',anB:'যোগ করুন',totL:'মোট খরচের প্ল্যান',svL:'সঞ্চয় লক্ষ্য (আয় + অতিরিক্ত - প্ল্যান)',pSaveB:'প্ল্যান সেভ করুন',impT:'ব্যাংক স্টেটমেন্ট থেকে খরচ'};
+const TR_MR={hi:'नमस्कार',balLbl:'या महिन्यात उरलेले (बजेटनुसार)',qAdd:'नवीन खर्च',qPlan:'बजेट प्लॅन',qImp:'स्टेटमेंट',qCsv:'अहवाल',chkT:'UPI पूर्वी तपासा',txT:'या महिन्याचे व्यवहार',addT:'नवीन खर्च / बचत',sgB:'सेव्ह करण्यापूर्वी थांबा',sokB:'आता सेव्ह करा',close:'बंद करा',planT:'मासिक बजेट प्लॅन',incL:'मुख्य मासिक उत्पन्न (रु)',exL:'अतिरिक्त उत्पन्न (रु)',anT:'नवीन अतिरिक्त खर्च',anNL:'नाव (उदा. भेट, डॉक्टर, घर दुरुस्ती)',anLL:'मर्यादा (रु, ऐच्छिक)',anB:'जोडा',totL:'एकूण खर्च प्लॅन',svL:'बचत उद्दिष्ट (उत्पन्न + अतिरिक्त - प्लॅन)',pSaveB:'प्लॅन सेव्ह करा',impT:'बँक स्टेटमेंटमधून खर्च'};
+const TR_TE={hi:'నమస్కారం',balLbl:'ఈ నెల మిగిలిన మొత్తం (బడ్జెట్ ప్రకారం)',qAdd:'కొత్త ఖర్చు',qPlan:'బడ్జెట్ ప్లాన్',qImp:'స్టేట్‌మెంట్',qCsv:'రిపోర్ట్',chkT:'UPI ముందు చూడండి',txT:'ఈ నెల లావాదేవీలు',addT:'కొత్త ఖర్చు / పొదుపు',sgB:'సేవ్ చేసే ముందు ఆగండి',sokB:'ఇప్పుడే సేవ్ చేయండి',close:'మూసివేయండి',planT:'నెలవారీ బడ్జెట్ ప్లాన్',incL:'ప్రధాన నెలవారీ ఆదాయం (రూ)',exL:'అదనపు ఆదాయం (రూ)',anT:'కొత్త అదనపు ఖర్చు',anNL:'పేరు (ఉదా. బహుమతి, డాక్టర్, ఇంటి మరమ్మత్తు)',anLL:'పరిమితి (రూ, ఐచ్ఛికం)',anB:'జోడించండి',totL:'మొత్తం ఖర్చు ప్లాన్',svL:'పొదుపు లక్ష్యం (ఆదాయం + అదనపు - ప్లాన్)',pSaveB:'ప్లాన్ సేవ్ చేయండి',impT:'బ్యాంక్ స్టేట్‌మెంట్ నుండి ఖర్చు'};
+const TR_TA={hi:'வணக்கம்',balLbl:'இந்த மாதம் மீதமுள்ளது (பட்ஜெட்டின் படி)',qAdd:'புதிய செலவு',qPlan:'பட்ஜெட் திட்டம்',qImp:'அறிக்கை',qCsv:'அறிக்கை',chkT:'UPI-க்கு முன் சரிபார்க்கவும்',txT:'இந்த மாத பரிவர்த்தனைகள்',addT:'புதிய செலவு / சேமிப்பு',sgB:'சேமிப்பதற்கு முன் காத்திருங்கள்',sokB:'இப்போது சேமிக்கவும்',close:'மூடு',planT:'மாதாந்திர பட்ஜெட் திட்டம்',incL:'முக்கிய மாத வருமானம் (ரூ)',exL:'கூடுதல் வருமானம் (ரூ)',anT:'புதிய கூடுதல் செலவு',anNL:'பெயர் (எ.கா. பரிசு, மருத்துவர், வீட்டு பழுது)',anLL:'வரம்பு (ரூ, விருப்பம்)',anB:'சேர்',totL:'மொத்த செலவுத் திட்டம்',svL:'சேமிப்பு இலக்கு (வருமானம் + கூடுதல் - திட்டம்)',pSaveB:'திட்டத்தை சேமிக்கவும்',impT:'வங்கி அறிக்கையிலிருந்து செலவு'};
+const TR_GU={hi:'નમસ્તે',balLbl:'આ મહિનાનું બાકી (બજેટ પ્રમાણે)',qAdd:'નવો ખર્ચ',qPlan:'બજેટ પ્લાન',qImp:'સ્ટેટમેન્ટ',qCsv:'રિપોર્ટ',chkT:'UPI પહેલાં તપાસો',txT:'આ મહિનાના વ્યવહારો',addT:'નવો ખર્ચ / બચત',sgB:'સેવ કરતાં પહેલાં રાહ જુઓ',sokB:'હમણાં સેવ કરો',close:'બંધ કરો',planT:'માસિક બજેટ પ્લાન',incL:'મુખ્ય માસિક આવક (રૂ)',exL:'વધારાની આવક (રૂ)',anT:'નવો વધારાનો ખર્ચ',anNL:'નામ (દા.ત. ભેટ, ડોક્ટર, ઘરનું સમારકામ)',anLL:'મર્યાદા (રૂ, વૈકલ્પિક)',anB:'ઉમેરો',totL:'કુલ ખર્ચ પ્લાન',svL:'બચત લક્ષ્ય (આવક + વધારાની - પ્લાન)',pSaveB:'પ્લાન સેવ કરો',impT:'બેંક સ્ટેટમેન્ટમાંથી ખર્ચ'};
+const TR_KN={hi:'ನಮಸ್ಕಾರ',balLbl:'ಈ ತಿಂಗಳು ಉಳಿದಿರುವುದು (ಬಜೆಟ್ ಪ್ರಕಾರ)',qAdd:'ಹೊಸ ಖರ್ಚು',qPlan:'ಬಜೆಟ್ ಯೋಜನೆ',qImp:'ಸ್ಟೇಟ್‌ಮೆಂಟ್',qCsv:'ವರದಿ',chkT:'UPI ಮೊದಲು ಪರಿಶೀಲಿಸಿ',txT:'ಈ ತಿಂಗಳ ವಹಿವಾಟುಗಳು',addT:'ಹೊಸ ಖರ್ಚು / ಉಳಿತಾಯ',sgB:'ಉಳಿಸುವ ಮೊದಲು ಕಾಯಿರಿ',sokB:'ಈಗ ಉಳಿಸಿ',close:'ಮುಚ್ಚಿ',planT:'ಮಾಸಿಕ ಬಜೆಟ್ ಯೋಜನೆ',incL:'ಮುಖ್ಯ ಮಾಸಿಕ ಆದಾಯ (ರೂ)',exL:'ಹೆಚ್ಚುವರಿ ಆದಾಯ (ರೂ)',anT:'ಹೊಸ ಹೆಚ್ಚುವರಿ ಖರ್ಚು',anNL:'ಹೆಸರು (ಉದಾ. ಉಡುಗೊರೆ, ವೈದ್ಯರು, ಮನೆ ದುರಸ್ತಿ)',anLL:'ಮಿತಿ (ರೂ, ಐಚ್ಛಿಕ)',anB:'ಸೇರಿಸಿ',totL:'ಒಟ್ಟು ಖರ್ಚು ಯೋಜನೆ',svL:'ಉಳಿತಾಯ ಗುರಿ (ಆದಾಯ + ಹೆಚ್ಚುವರಿ - ಯೋಜನೆ)',pSaveB:'ಯೋಜನೆ ಉಳಿಸಿ',impT:'ಬ್ಯಾಂಕ್ ಸ್ಟೇಟ್‌ಮೆಂಟ್‌ನಿಂದ ಖರ್ಚು'};
+const TR_ML={hi:'നമസ്കാരം',balLbl:'ഈ മാസം ബാക്കി (ബജറ്റ് അനുസരിച്ച്)',qAdd:'പുതിയ ചെലവ്',qPlan:'ബജറ്റ് പ്ലാൻ',qImp:'സ്റ്റേറ്റ്മെന്റ്',qCsv:'റിപ്പോർട്ട്',chkT:'UPI-ക്ക് മുമ്പ് പരിശോധിക്കൂ',txT:'ഈ മാസത്തെ ഇടപാടുകൾ',addT:'പുതിയ ചെലവ് / സമ്പാദ്യം',sgB:'സേവ് ചെയ്യുന്നതിന് മുമ്പ് കാത്തിരിക്കൂ',sokB:'ഇപ്പോൾ സേവ് ചെയ്യൂ',close:'അടയ്ക്കുക',planT:'പ്രതിമാസ ബജറ്റ് പ്ലാൻ',incL:'പ്രധാന പ്രതിമാസ വരുമാനം (രൂ)',exL:'അധിക വരുമാനം (രൂ)',anT:'പുതിയ അധിക ചെലവ്',anNL:'പേര് (ഉദാ. സമ്മാനം, ഡോക്ടർ, വീട് അറ്റകുറ്റപ്പണി)',anLL:'പരിധി (രൂ, ഓപ്ഷണൽ)',anB:'ചേർക്കുക',totL:'ആകെ ചെലവ് പ്ലാൻ',svL:'സമ്പാദ്യ ലക്ഷ്യം (വരുമാനം + അധികം - പ്ലാൻ)',pSaveB:'പ്ലാൻ സേവ് ചെയ്യൂ',impT:'ബാങ്ക് സ്റ്റേറ്റ്മെന്റിൽ നിന്നുള്ള ചെലവ്'};
+const TR_PA={hi:'ਸਤ ਸ੍ਰੀ ਅਕਾਲ',balLbl:'ਇਸ ਮਹੀਨੇ ਬਚਿਆ (ਬਜਟ ਅਨੁਸਾਰ)',qAdd:'ਨਵਾਂ ਖ਼ਰਚਾ',qPlan:'ਬਜਟ ਯੋਜਨਾ',qImp:'ਸਟੇਟਮੈਂਟ',qCsv:'ਰਿਪੋਰਟ',chkT:'UPI ਤੋਂ ਪਹਿਲਾਂ ਚੈੱਕ ਕਰੋ',txT:'ਇਸ ਮਹੀਨੇ ਦੇ ਲੈਣ-ਦੇਣ',addT:'ਨਵਾਂ ਖ਼ਰਚਾ / ਬੱਚਤ',sgB:'ਸੇਵ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਰੁਕੋ',sokB:'ਹੁਣੇ ਸੇਵ ਕਰੋ',close:'ਬੰਦ ਕਰੋ',planT:'ਮਹੀਨਾਵਾਰ ਬਜਟ ਯੋਜਨਾ',incL:'ਮੁੱਖ ਮਹੀਨਾਵਾਰ ਆਮਦਨ (ਰੁਪਏ)',exL:'ਵਾਧੂ ਆਮਦਨ (ਰੁਪਏ)',anT:'ਨਵਾਂ ਵਾਧੂ ਖ਼ਰਚਾ',anNL:'ਨਾਮ (ਜਿਵੇਂ ਤੋਹਫ਼ਾ, ਡਾਕਟਰ, ਘਰ ਦੀ ਮੁਰੰਮਤ)',anLL:'ਹੱਦ (ਰੁਪਏ, ਵਿਕਲਪਿਕ)',anB:'ਜੋੜੋ',totL:'ਕੁੱਲ ਖ਼ਰਚਾ ਯੋਜਨਾ',svL:'ਬੱਚਤ ਟੀਚਾ (ਆਮਦਨ + ਵਾਧੂ - ਯੋਜਨਾ)',pSaveB:'ਯੋਜਨਾ ਸੇਵ ਕਰੋ',impT:'ਬੈਂਕ ਸਟੇਟਮੈਂਟ ਤੋਂ ਖ਼ਰਚਾ'};
+const TR_UR={hi:'آداب',balLbl:'اس مہینے کا بچا ہوا (بجٹ کے مطابق)',qAdd:'نیا خرچ',qPlan:'بجٹ پلان',qImp:'اسٹیٹمنٹ',qCsv:'رپورٹ',chkT:'UPI سے پہلے دیکھیں',txT:'اس مہینے کے لین دین',addT:'نیا خرچ / بچت',sgB:'محفوظ کرنے سے پہلے رکیں',sokB:'ابھی محفوظ کریں',close:'بند کریں',planT:'ماہانہ بجٹ پلان',incL:'بنیادی ماہانہ آمدنی (روپے)',exL:'اضافی آمدنی (روپے)',anT:'نیا اضافی خرچ',anNL:'نام (جیسے تحفہ، ڈاکٹر، گھر کی مرمت)',anLL:'حد (روپے، اختیاری)',anB:'شامل کریں',totL:'کل خرچ کا پلان',svL:'بچت کا ہدف (آمدنی + اضافی - پلان)',pSaveB:'پلان محفوظ کریں',impT:'بینک اسٹیٹمنٹ سے خرچ'};
+const RTL=['ur','sd','ks'];
+let LANG=localStorage.getItem('pp_lang')||'hn';
+const EXTRA={bn:TR_BN,mr:TR_MR,te:TR_TE,ta:TR_TA,gu:TR_GU,kn:TR_KN,ml:TR_ML,pa:TR_PA,ur:TR_UR};
+function trOf(l){if(l==='en')return TR.en;if(l==='hn')return TR.hn;if(l==='hi')return TR.hi;return Object.assign({},TR.en,EXTRA[l]||{})}
+function applyLang(){
+  const L=trOf(LANG);
+  document.documentElement.lang=LANG;
+  document.documentElement.dir=RTL.includes(LANG)?'rtl':'ltr';
+  document.querySelectorAll('[data-t]').forEach(el=>{const k=el.dataset.t;if(L[k]!==undefined)el.textContent=L[k]});
+  $('lg').value=LANG;
+}
+$('lg').innerHTML=LANGS.map(([v,n])=>`<option value="${v}">${n}${(EXTRA[v]||v==='en'||v==='hn'||v==='hi')?'':' (jaldi)'}</option>`).join('');
+$('lg').onchange=()=>{LANG=$('lg').value;localStorage.setItem('pp_lang',LANG);applyLang()};
 function allCats(S){return [...Object.keys(CATS),...((S&&S.custom)||[]).map(x=>x.name)]}
 function getSubs(c){return (CATS[c]&&CATS[c].subs)||['General']}
 function colOf(c){return (CATS[c]&&CATS[c].col)||'#455a64'}
@@ -378,6 +417,46 @@ $('impGo').onclick=()=>{
   $('impMsg').textContent=`${added} kharche jod diye. ${dup} pehle se the. ${skipped} skip hue. Category galat lage to entry par category badal sakte ho (abhi Hatao karke dobara daalo).`;
   render();
 };
+
+// ---- AI monthly summary (sirf numbers bheje jaate hain) ----
+const LANG_NAMES={hn:'Hinglish (Hindi in Roman letters)',en:'English',hi:'Hindi',bn:'Bengali',mr:'Marathi',te:'Telugu',ta:'Tamil',gu:'Gujarati',kn:'Kannada',ml:'Malayalam',pa:'Punjabi',ur:'Urdu',or:'Odia',as:'Assamese',ne:'Nepali',sa:'Sanskrit',kok:'Konkani',mai:'Maithili',doi:'Dogri',mni:'Manipuri',brx:'Bodo',sat:'Santali',ks:'Kashmiri',sd:'Sindhi'};
+function cleanAi(t){return String(t||'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/^#{1,6}\s*/gm,'').replace(/^\s*[\*\-]\s+/gm,'• ')}
+async function aiSummary(){
+  const out=$('aiOut');
+  const S=load();const mk=today().slice(0,7);
+  const month=S.items.filter(x=>x.d.slice(0,7)===mk);
+  const of=c=>month.filter(x=>x.c===c).reduce((a,x)=>a+x.amt,0);
+  const cats=allCats(S);
+  const income=(+S.income||0)+(+S.extra||0);
+  const planExp=cats.filter(c=>c!=='Savings').reduce((a,c)=>a+(+S.plan[c]||0),0);
+  const spent=month.filter(x=>x.c!=='Savings').reduce((a,x)=>a+x.amt,0);
+  const saved=of('Savings');
+  if(!income&&!planExp&&!spent){out.textContent='Pehle plan aur kuch kharche daalo, phir summary banegi.';return}
+  const lines=cats.map(c=>`${c}: kharch Rs ${Math.round(of(c))}, plan Rs ${Math.round(+S.plan[c]||0)}`).join('\n');
+  const lang=LANG_NAMES[LANG]||'English';
+  const prompt=`You are a simple household budget helper. Using ONLY these numbers (in Indian rupees), write a short, friendly monthly summary in ${lang}.
+Cover: 1) total spent vs plan, 2) categories that went over plan, 3) two or three practical tips to save next month, 4) one line saying this is general guidance, not financial advice.
+Keep it under 150 words. Plain text, no markdown.
+
+Monthly income (main + extra): Rs ${Math.round(income)}
+Total planned expense: Rs ${Math.round(planExp)}
+Total spent this month (excluding savings): Rs ${Math.round(spent)}
+Savings put aside this month: Rs ${Math.round(saved)}
+Savings target: Rs ${Math.round(Math.max(0,income-planExp))}
+Category details:
+${lines}`;
+  out.textContent='Ruko, summary ban raha hai...';
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:prompt})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.text)throw new Error(d.error||('Server error '+r.status));
+    out.textContent=cleanAi(d.text);
+  }catch(e){out.textContent='Summary nahi bani: '+e.message+'\n\nThodi der baad dobara try karo.'}
+}
+$('qAi').onclick=()=>{$('aiSheet').classList.add('on');aiSummary()};
+$('aiAgain').onclick=aiSummary;
+$('aiX').onclick=()=>$('aiSheet').classList.remove('on');
+applyLang();
 render();
 if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'))}
 </script></body></html>
