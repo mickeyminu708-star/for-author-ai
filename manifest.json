@@ -1,0 +1,17 @@
+{
+  "id": "/mmdsauthor-ai",
+  "name": "MMDSAuthor AI",
+  "short_name": "MMDSAuthor",
+  "description": "Books likhne, research aur KDP ke liye AI saathi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1d6fe0",
+  "categories": ["books", "productivity", "education"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
