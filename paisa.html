@@ -50,6 +50,7 @@ input,select,textarea{width:100%;border:1px solid var(--line);border-radius:12px
 .plan .c .t input{width:120px}
 .plan .c .sub{font-size:12px;color:var(--mu);margin-top:4px}
 .line{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+#lg option{color:#14241d;background:#fff}
 </style></head><body>
 <div class="top"><div class="hi" data-t="hi">Namaste</div><h1>Paisa Pehredar</h1><select id="lg" style="margin-top:8px;width:auto;max-width:100%;border-radius:10px;padding:6px 8px;font-size:13px;background:rgba(255,255,255,.2);color:#fff;border:0"></select></div>
 <div class="wrap">
@@ -174,8 +175,6 @@ function applyLang(){
   document.querySelectorAll('[data-t]').forEach(el=>{const k=el.dataset.t;if(L[k]!==undefined)el.textContent=L[k]});
   $('lg').value=LANG;
 }
-$('lg').innerHTML=LANGS.map(([v,n])=>`<option value="${v}">${n}${(EXTRA[v]||v==='en'||v==='hn'||v==='hi')?'':' (jaldi)'}</option>`).join('');
-$('lg').onchange=()=>{LANG=$('lg').value;localStorage.setItem('pp_lang',LANG);applyLang()};
 function allCats(S){return [...Object.keys(CATS),...((S&&S.custom)||[]).map(x=>x.name)]}
 function getSubs(c){return (CATS[c]&&CATS[c].subs)||['General']}
 function colOf(c){return (CATS[c]&&CATS[c].col)||'#455a64'}
@@ -456,6 +455,8 @@ ${lines}`;
 $('qAi').onclick=()=>{$('aiSheet').classList.add('on');aiSummary()};
 $('aiAgain').onclick=aiSummary;
 $('aiX').onclick=()=>$('aiSheet').classList.remove('on');
+$('lg').innerHTML=LANGS.map(([v,n])=>`<option value="${v}">${n}${(EXTRA[v]||v==='en'||v==='hn'||v==='hi')?'':' (jaldi)'}</option>`).join('');
+$('lg').onchange=()=>{LANG=$('lg').value;localStorage.setItem('pp_lang',LANG);applyLang()};
 applyLang();
 render();
 if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'))}
