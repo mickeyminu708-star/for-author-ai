@@ -25,6 +25,8 @@ header{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 1px 6px 
 header h1{font-size:19px;color:#0b2545;line-height:1.2}nav{box-shadow:0 3px 8px rgba(29,111,224,.06)}
 .card{box-shadow:0 2px 12px rgba(29,111,224,.08);border-radius:16px}.sub{color:var(--mu)}
 nav button{box-shadow:0 1px 3px rgba(0,0,0,.05)}button.go{box-shadow:0 4px 12px rgba(29,111,224,.25)}
+.pp{background:#fff;color:#000;padding:.5in;box-sizing:border-box;position:relative;overflow:hidden;font-family:Georgia,serif;break-after:page;margin:0 auto 10px}
+.pp .pno{position:absolute;bottom:.25in;right:.5in;font-size:10pt;color:#555}.pv .pp{zoom:.5}
 </style><meta name="theme-color" content="#1d6fe0"><link rel="manifest" href="/manifest.json"><link rel="icon" href="/icon.svg" type="image/svg+xml"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MMDSAuthor AI"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
 <header><div class="brand"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d6fe0"/><stop offset="1" stop-color="#4aa3ff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><path d="M13 21c7-3 14-2 19 2v27c-5-4-12-5-19-2z" fill="#fff"/><path d="M51 21c-7-3-14-2-19 2v27c5-4 12-5 19-2z" fill="#fff" opacity=".85"/></svg><h1>MMDSAuthor AI</h1></div><select id="lang" style="width:auto"></select></header>
 <p class="sub">Books likhne ka aapka apna AI saathi</p>
@@ -69,7 +71,7 @@ const TOOLS=[
 ];
 
 const TABS=[...STEPS.map(s=>({k:'s:'+s.id,n:s.n})),...TOOLS.map(t=>({k:'t:'+t.id,n:t.n})),
- {k:'img',n:'Image Studio'},{k:'cb',n:'Colouring Book'},{k:'amz',n:'Amazon Search'},{k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
+ {k:'pz',n:'Puzzle & Journal'},{k:'img',n:'Image Studio'},{k:'cb',n:'Colouring Book'},{k:'amz',n:'Amazon Search'},{k:'chat',n:'Live Assist'},{k:'chars',n:'Characters'},{k:'spine',n:'KDP Cover'},{k:'roy',n:'Royalty'},{k:'exp',n:'Export'}];
 function nav(k){
   $('#nav').innerHTML=TABS.map(t=>`<button class="${t.k===k?'on':''}" data-k="${t.k}">${esc(t.n)}</button>`).join('');
   $('#nav').querySelectorAll('button').forEach(b=>b.onclick=()=>open(b.dataset.k));
@@ -77,7 +79,7 @@ function nav(k){
 }
 function open(k){ls.s('fa_tab',k);nav(k);const [t,id]=k.split(':');
   if(t==='s')gen(STEPS.find(x=>x.id===id),true);else if(t==='t')gen(TOOLS.find(x=>x.id===id),false);
-  else ({img,cb,amz,chat,chars,spine,roy,exp})[k]();}
+  else ({pz,img,cb,amz,chat,chars,spine,roy,exp})[k]();}
 
 function gen(d,studio){
   const sv=ls.g('fa_f_'+d.id,{});
@@ -140,6 +142,197 @@ function img(){
     }catch(e){$('#ist').className='st er';$('#ist').textContent='Error: '+e.message}
     b.disabled=false};
   if(IM.p)$('#ist').textContent='Pichli prompt yaad hai, Banao dabao.';
+}
+
+const PZT=[['8.5 x 11 in',8.5,11],['6 x 9 in',6,9],['8.5 x 8.5 in',8.5,8.5]];
+const PZS=ls.g('fa_pz',{t:'ws',title:'',n:5,trim:0,pn:true,tp:true,sl:true,size:15,mz:1,diff:46,words:'ANIMAL,BOOK,MOM,LOVE,HOME,SUN,TREE,FLOWER,HAPPY,SMILE',prompts:'Aaj kya achha hua?\nAaj kis baat ke liye shukriya?'});
+function pzShuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t}return a}
+function wsGen(words,N){
+  const g=Array.from({length:N},()=>Array(N).fill(''));const m=Array.from({length:N},()=>Array(N).fill(false));
+  const dirs=[[0,1],[1,0],[1,1],[1,-1],[0,-1],[-1,0],[-1,-1],[-1,1]];const ok=[];
+  for(const w of words){
+    let done=false;
+    for(let t=0;t<400&&!done;t++){
+      const d=dirs[Math.floor(Math.random()*dirs.length)];
+      const r=Math.floor(Math.random()*N),c=Math.floor(Math.random()*N);
+      const cells=[];let good=true;
+      for(let k=0;k<w.length;k++){
+        const rr=r+d[0]*k,cc=c+d[1]*k;
+        if(rr<0||cc<0||rr>=N||cc>=N){good=false;break}
+        if(g[rr][cc]&&g[rr][cc]!==w[k]){good=false;break}
+        cells.push([rr,cc,w[k]]);
+      }
+      if(!good)continue;
+      cells.forEach(([rr,cc,ch])=>{g[rr][cc]=ch;m[rr][cc]=true});
+      done=true;
+    }
+    if(done)ok.push(w);
+  }
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++)if(!g[i][j])g[i][j]=String.fromCharCode(65+Math.floor(Math.random()*26));
+  return {g,m,ok};
+}
+function sdOk(b,r,c,n){
+  for(let i=0;i<9;i++){if(b[r][i]===n||b[i][c]===n)return false}
+  const br=r-r%3,bc=c-c%3;
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(b[br+i][bc+j]===n)return false;
+  return true;
+}
+function sdFill(b){
+  for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(!b[r][c]){
+    for(const n of pzShuffle([1,2,3,4,5,6,7,8,9])){
+      if(sdOk(b,r,c,n)){b[r][c]=n;if(sdFill(b))return true;b[r][c]=0}
+    }
+    return false;
+  }
+  return true;
+}
+function sdGen(blanks){
+  const b=Array.from({length:9},()=>Array(9).fill(0));sdFill(b);
+  const sol=b.map(r=>r.slice());const p=b.map(r=>r.slice());
+  let k=blanks;
+  while(k>0){const r=Math.floor(Math.random()*9),c=Math.floor(Math.random()*9);if(p[r][c]){p[r][c]=0;k--}}
+  return {p,sol};
+}
+function mzGen(W,H){
+  const cells=Array.from({length:H},()=>Array.from({length:W},()=>({v:false,w:[true,true,true,true]})));
+  const st=[[0,0]];cells[0][0].v=true;
+  while(st.length){
+    const [r,c]=st[st.length-1];const nb=[];
+    if(r>0&&!cells[r-1][c].v)nb.push([r-1,c,0,2]);
+    if(c<W-1&&!cells[r][c+1].v)nb.push([r,c+1,1,3]);
+    if(r<H-1&&!cells[r+1][c].v)nb.push([r+1,c,2,0]);
+    if(c>0&&!cells[r][c-1].v)nb.push([r,c-1,3,1]);
+    if(!nb.length){st.pop();continue}
+    const [nr,nc,w1,w2]=nb[Math.floor(Math.random()*nb.length)];
+    cells[r][c].w[w1]=false;cells[nr][nc].w[w2]=false;cells[nr][nc].v=true;st.push([nr,nc]);
+  }
+  cells[0][0].w[0]=false;cells[H-1][W-1].w[2]=false;
+  return cells;
+}
+function mzSvg(cells,W,H){
+  const s=10;let d='';
+  cells.forEach((row,r)=>row.forEach((cl,c)=>{
+    const x=c*s,y=r*s;
+    if(cl.w[0])d+=`M${x} ${y}H${x+s}`;
+    if(cl.w[1])d+=`M${x+s} ${y}V${y+s}`;
+    if(cl.w[2])d+=`M${x} ${y+s}H${x+s}`;
+    if(cl.w[3])d+=`M${x} ${y}V${y+s}`;
+  }));
+  return `<svg viewBox="-1 -1 ${W*s+2} ${H*s+2}" style="width:100%;height:auto"><path d="${d}" stroke="#000" stroke-width="0.6" fill="none" stroke-linecap="square"/></svg>`;
+}
+function sv(){
+  const P=PZS;
+  P.t=$('#pt').value;P.title=$('#ptt').value;P.n=Math.min(60,Math.max(1,+$('#pn').value||1));
+  P.trim=+$('#ptr').value;P.pn=$('#ppn').checked;P.tp=$('#ptp').checked;P.sl=$('#psl').checked;
+  if($('#pwd'))P.words=$('#pwd').value;
+  if($('#psz'))P.size=+$('#psz').value;
+  if($('#pmz'))P.mz=+$('#pmz').value;
+  if($('#pdf'))P.diff=+$('#pdf').value;
+  if($('#pjp'))P.prompts=$('#pjp').value;
+  ls.s('fa_pz',P);
+}
+function pzBuild(){
+  const P=PZS,tr=PZT[P.trim],W=tr[1],H=tr[2],n=P.n;
+  const items=[],sols=[];
+  if(P.tp)items.push({h:`<div style="text-align:center;margin-top:2.8in"><h1 style="font-size:32pt;margin-bottom:.3in">${esc(P.title||'Activity Book')}</h1><p style="font-size:14pt">This book belongs to ______________________</p></div>`,num:false});
+  if(P.t==='ws'){
+    const list=(P.words||'').toUpperCase().split(/[^A-Z]+/).filter(x=>x.length>=3&&x.length<=P.size);
+    if(!list.length)throw new Error('Words likho (sirf A-Z, 3 se lamba, grid se chhota)');
+    const N=P.size,cs=(W-1.2)/N;
+    const tbl=(g,m)=>`<table style="border-collapse:collapse;margin:0 auto">${g.map((row,r)=>`<tr>${row.map((ch,c)=>`<td style="width:${cs}in;height:${cs}in;text-align:center;font-size:${(cs*44).toFixed(1)}pt;border:1px solid #bbb;${m&&m[r][c]?'font-weight:bold;background:#ffe9a8':''}">${ch}</td>`).join('')}</tr>`).join('')}</table>`;
+    for(let i=0;i<n;i++){
+      const words=pzShuffle(list.slice()).slice(0,12);
+      const {g,m,ok}=wsGen(words,N);
+      items.push({h:`<h3 style="text-align:center;margin:0 0 .2in">Word Search ${i+1}</h3>${tbl(g,null)}<p style="font-size:12pt;margin-top:.25in;text-align:center;line-height:1.7">${ok.join(' &nbsp; ')}</p>`,num:true});
+      if(P.sl)sols.push({h:`<h3 style="text-align:center">Answers ${i+1}</h3>${tbl(g,m)}`,num:true});
+    }
+  } else if(P.t==='sd'){
+    const tbl=(g)=>`<table style="border-collapse:collapse;margin:0 auto">${g.map((row,r)=>`<tr>${row.map((v,c)=>`<td style="width:.5in;height:.5in;text-align:center;font-size:18pt;border-top:${r%3==0?'2px':'1px'} solid #000;border-left:${c%3==0?'2px':'1px'} solid #000;border-right:${c==8?'2px':'1px'} solid #000;border-bottom:${r==8?'2px':'1px'} solid #000">${v||''}</td>`).join('')}</tr>`).join('')}</table>`;
+    for(let i=0;i<n;i++){
+      const {p,sol}=sdGen(P.diff);
+      items.push({h:`<h3 style="text-align:center">Sudoku ${i+1}</h3><p style="text-align:center;font-size:11pt">1 se 9 tak har row, column aur 3x3 box mein har number ek baar.</p>${tbl(p)}`,num:true});
+      if(P.sl)sols.push({h:`<h3 style="text-align:center">Sudoku ${i+1} Solution</h3>${tbl(sol)}`,num:true});
+    }
+  } else if(P.t==='mz'){
+    const [mw,mh]=[[10,14],[12,16],[15,20]][P.mz]||[12,16];
+    for(let i=0;i<n;i++){
+      const cells=mzGen(mw,mh);
+      items.push({h:`<h3 style="text-align:center">Maze ${i+1}</h3><p style="text-align:center;font-size:11pt">Start: upar-left se. Finish: neeche-right tak pahunchein.</p><div style="width:${W-1.2}in;margin:0 auto">${mzSvg(cells,mw,mh)}</div>`,num:true});
+    }
+  } else if(P.t==='jl'){
+    const lines=Math.floor((H-1.6)/0.4);
+    for(let i=0;i<n;i++){
+      items.push({h:`<div style="font-size:12pt">Date: ____________________</div><div style="margin-top:.2in">${'<div style="border-bottom:1px solid #999;height:0.4in"></div>'.repeat(lines)}</div>`,num:true});
+    }
+  } else if(P.t==='jd'){
+    const prompts=P.prompts.split('\n').map(x=>x.trim()).filter(Boolean);
+    const lines=Math.floor((H-3.2)/0.4);
+    for(let i=0;i<n;i++){
+      items.push({h:`<div style="font-size:12pt">Date: ____________ &nbsp; Mood: ____________</div>${prompts.map(q=>`<div style="margin-top:.25in;font-size:12pt">${esc(q)}</div><div style="border-bottom:1px solid #999;height:.4in"></div><div style="border-bottom:1px solid #999;height:.4in"></div>`).join('')}${'<div style="border-bottom:1px solid #999;height:0.4in"></div>'.repeat(Math.max(0,lines-prompts.length*2))}`,num:true});
+    }
+  } else if(P.t==='jw'){
+    const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+    const bh=(H-1.8)/7;
+    for(let i=0;i<n;i++){
+      items.push({h:`<h3 style="text-align:center;margin:0 0 .15in">Week ${i+1}</h3>${days.map(d=>`<div style="border:1px solid #999;height:${bh.toFixed(2)}in;margin-bottom:.06in;padding:4px 6px;font-size:11pt"><b>${d}</b></div>`).join('')}`,num:true});
+    }
+  }
+  items.push(...sols);
+  let k=0;
+  const pages=items.map(it=>{
+    if(it.num)k++;
+    return `<div class="pp" style="width:${W}in;height:${H}in">${it.h}${P.pn&&it.num?`<div class="pno">${k}</div>`:''}</div>`;
+  });
+  return {pages,W,H};
+}
+function pzPrint(h,W,H){
+  let st=$('#pzs');if(!st){st=document.createElement('style');st.id='pzs';document.head.appendChild(st)}
+  st.textContent=`@page{size:${W}in ${H}in;margin:0}`;
+  let d=$('#pr');if(d)d.remove();
+  d=document.createElement('div');d.id='pr';d.innerHTML=h;document.body.appendChild(d);
+  setTimeout(()=>window.print(),400);
+}
+function pz(){
+  const P=PZS;
+  $('#view').innerHTML=`<section class="card"><h2>Puzzle & Journal Studio</h2>
+  <label>Kya banana hai<select id="pt"><option value="ws">Word search</option><option value="sd">Sudoku</option><option value="mz">Maze</option><option value="jl">Journal: lined pages</option><option value="jd">Journal: daily page</option><option value="jw">Journal: weekly planner</option></select></label>
+  <div id="pw"></div>
+  <label>Book title<input id="ptt" value="${esc(P.title)}" placeholder="jaise: Puzzle Fun for Seniors"></label>
+  <label>Kitne puzzle / pages (max 60)<input id="pn" type="number" min="1" max="60" value="${P.n}"></label>
+  <label>Page size<select id="ptr">${PZT.map((x,i)=>`<option value="${i}"${i==P.trim?' selected':''}>${x[0]}</option>`).join('')}</select></label>
+  <label><input id="ppn" type="checkbox" style="width:auto" ${P.pn?'checked':''}> Page numbers</label>
+  <label><input id="ptp" type="checkbox" style="width:auto" ${P.tp?'checked':''}> Title page</label>
+  <label><input id="psl" type="checkbox" style="width:auto" ${P.sl?'checked':''}> Solution pages (sudoku aur word search ke aakhir mein)</label>
+  <button class="go" id="pb">Preview banao</button><button class="sec" id="pq">PDF / Print</button>
+  <div class="st" id="pst"></div><div id="pprev"></div></section>`;
+  $('#pt').value=P.t;
+  const fld={
+    ws:`<label>Words (comma se, sirf A-Z, 3 se lamba)<textarea id="pwd" rows="3">${esc(P.words)}</textarea></label><label>Grid size<select id="psz">${[10,12,15,18,20].map(v=>`<option${v==P.size?' selected':''}>${v}</option>`).join('')}</select></label>`,
+    sd:`<label>Mushkil<select id="pdf"><option value="36"${P.diff==36?' selected':''}>Aasan (36 khaali)</option><option value="46"${P.diff==46?' selected':''}>Medium (46 khaali)</option><option value="54"${P.diff==54?' selected':''}>Mushkil (54 khaali)</option></select></label>`,
+    mz:`<label>Maze size<select id="pmz">${[[10,14],[12,16],[15,20]].map((x,i)=>`<option value="${i}"${i==P.mz?' selected':''}>${x[0]} x ${x[1]} cells</option>`).join('')}</select></label>`,
+    jl:'<p class="note">Lined pages: har page par lines aur date.</p>',
+    jd:`<label>Daily prompts (har line ek sawal)<textarea id="pjp" rows="3">${esc(P.prompts)}</textarea></label>`,
+    jw:'<p class="note">Weekly planner: har page par Monday se Sunday tak 7 boxes.</p>'
+  };
+  const bind=()=>{['#pwd','#psz','#pmz','#pdf','#pjp'].forEach(x=>{if($(x)){$(x).oninput=sv;$(x).onchange=sv}})};
+  const draw=()=>{$('#pw').innerHTML=fld[P.t]||'';bind()};
+  ['#ptt','#pn','#ptr','#ppn','#ptp','#psl'].forEach(x=>{$(x).oninput=sv;$(x).onchange=sv});
+  $('#pt').onchange=()=>{sv();draw()};
+  draw();
+  $('#pb').onclick=()=>{
+    sv();
+    try{
+      const r=pzBuild();
+      $('#pprev').innerHTML=`<div class="pv" style="margin-top:12px">${r.pages.slice(0,2).join('')}</div>`;
+      $('#pst').className='st';
+      $('#pst').textContent=`${r.pages.length} pages taiyar. Upar 2 pages ka preview hai. Sab ke liye PDF / Print dabao.`;
+    }catch(e){$('#pst').className='st er';$('#pst').textContent=e.message}
+  };
+  $('#pq').onclick=()=>{
+    sv();
+    try{const r=pzBuild();pzPrint(r.pages.join(''),r.W,r.H)}
+    catch(e){$('#pst').className='st er';$('#pst').textContent=e.message}
+  };
 }
 
 function cb(){
