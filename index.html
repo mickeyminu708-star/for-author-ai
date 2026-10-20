@@ -29,7 +29,7 @@ nav button{box-shadow:0 1px 3px rgba(0,0,0,.05)}button.go{box-shadow:0 4px 12px 
 .pp .pno{position:absolute;bottom:.25in;right:.5in;font-size:10pt;color:#555}.pv .pp{zoom:.5}
 </style><meta name="theme-color" content="#1d6fe0"><link rel="manifest" href="/manifest.json"><link rel="icon" href="/icon.svg" type="image/svg+xml"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="MMDSAuthor AI"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
 <header><div class="brand"><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d6fe0"/><stop offset="1" stop-color="#4aa3ff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><path d="M13 21c7-3 14-2 19 2v27c-5-4-12-5-19-2z" fill="#fff"/><path d="M51 21c-7-3-14-2-19 2v27c5-4 12-5 19-2z" fill="#fff" opacity=".85"/></svg><h1>MMDSAuthor AI</h1></div><select id="lang" style="width:auto"></select></header>
-<p class="sub">Books likhne ka aapka apna AI saathi</p>
+<p class="sub">Books likhne ka aapka apna AI saathi</p><p class="sub" style="margin-top:-4px;font-size:12px">Creator: DLS Sawant</p>
 <nav id="nav"></nav><main id="view"></main>
 <script>
 const LANGS=["English","Hindi","Hinglish (Hindi in Roman letters)","Spanish","French","German","Portuguese","Italian","Arabic","Bengali","Tamil","Telugu","Marathi","Gujarati","Kannada","Malayalam","Punjabi","Urdu","Chinese","Japanese","Korean","Russian","Turkish","Indonesian","Dutch","Swahili"];
@@ -332,6 +332,76 @@ function pz(){
     sv();
     try{const r=pzBuild();pzPrint(r.pages.join(''),r.W,r.H)}
     catch(e){$('#pst').className='st er';$('#pst').textContent=e.message}
+  };
+}
+
+function sp(){
+  const S=ls.g('fa_spend',{mb:'',th:5000,items:[]});
+  const CATS=['Ghar','EMI','Bachhe ki padhai','Bachat','Other'];
+  const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+  const mk=today().slice(0,7);
+  const month=S.items.filter(x=>x.d.slice(0,7)===mk);
+  const spentOf=c=>month.filter(x=>x.c===c).reduce((a,x)=>a+x.amt,0);
+  const spent=month.filter(x=>x.c!=='Bachat').reduce((a,x)=>a+x.amt,0);
+  const saved=spentOf('Bachat');
+  const budget=+S.mb||0;
+  const pct=budget?spent/budget*100:0;
+  const warn=!budget?'':pct>=100?`<div class="msg" style="background:#ffe1e6;color:#8a0018">Budget khatam: is mahine ka limit Rs ${budget} paar ho gaya hai.</div>`:pct>=80?`<div class="msg" style="background:#fff4d6;color:#6b4d00">${pct.toFixed(0)}% budget kharch ho chuka hai. Ruko aur socho.</div>`:'';
+  $('#view').innerHTML=`<section class="card"><h2>Paisa Pehredar</h2>
+  <p class="note">Ye sirf aapka reminder aur record hai. Ye bank ya UPI se nahi judta, paisa aap khud apne app se bhejoge.</p>
+  <div class="row"><label style="flex:1;min-width:140px">Mahine ka budget (Rs)<input id="sb" type="number" value="${S.mb}"></label><label style="flex:1;min-width:140px">Bada transfer limit (Rs)<input id="st" type="number" value="${S.th}"></label></div>
+  ${warn}
+  <div class="big">Kharch: Rs ${spent.toFixed(0)}${budget?' / '+budget:''}</div>
+  <div>Is mahine bachat: Rs ${saved.toFixed(0)}</div>
+  <div style="margin-top:8px">${CATS.filter(c=>c!=='Bachat').map(c=>`<div class="ch"><span>${c}</span><b>Rs ${spentOf(c).toFixed(0)}</b></div>`).join('')}</div>
+  <h2 style="margin-top:16px">Naya kharch / bachat</h2>
+  <label>Tareekh<input id="sd" type="date" value="${today()}"></label>
+  <label>Raqam (Rs)<input id="sa" type="number" placeholder="jaise 1500"></label>
+  <label>Kisko / kahan<input id="sw" placeholder="jaise school fees, EMI bank"></label>
+  <label>Category<select id="sc">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></label>
+  <label>Note (optional)<input id="sn"></label>
+  <button class="go" id="sg">Save karne se pehle ruko</button>
+  <div id="stm" class="msg" style="display:none"></div>
+  <button class="go" id="sok" style="display:none">Pakka save karo</button>
+  <div class="st" id="sst"></div>
+  <h2 style="margin-top:16px">Is mahine ki entries</h2>
+  <div id="slist"></div>
+  <div class="row"><button class="sec" id="scsv">CSV download</button></div></section>`;
+
+  const list=month.slice().sort((a,b)=>b.d.localeCompare(a.d));
+  $('#slist').innerHTML=list.length?list.map(x=>`<div class="ch"><div><b>Rs ${x.amt}</b> ${esc(x.to)} <span class="note">${x.c} · ${x.d}</span>${x.n?`<div class="note">${esc(x.n)}</div>`:''}</div><button class="sec" data-id="${x.id}">Hatao</button></div>`).join(''):'<p class="note">Is mahine koi entry nahi.</p>';
+  $('#slist').querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>{
+    S.items=S.items.filter(i=>String(i.id)!==b.dataset.id);ls.s('fa_spend',S);sp();
+  });
+  $('#sb').onchange=()=>{S.mb=$('#sb').value;ls.s('fa_spend',S);sp()};
+  $('#st').onchange=()=>{S.th=$('#st').value;ls.s('fa_spend',S)};
+
+  let tmr=null,n=30;
+  $('#sg').onclick=()=>{
+    const amt=+$('#sa').value;
+    if(!(amt>0)){$('#sst').className='st er';$('#sst').textContent='Raqam daalo';return}
+    if(!$('#sw').value.trim()){$('#sst').className='st er';$('#sst').textContent='Kisko / kahan likho';return}
+    const big=amt>=(+$('#st').value||5000);
+    n=30;$('#sg').disabled=true;$('#sok').style.display='none';$('#sst').textContent='';
+    const box=$('#stm');box.style.display='block';
+    const tick=()=>{
+      if(n>0){box.textContent=`Ruko! ${n} second baad hi save hoga.${big?' Ye bada transfer hai, dobara soch lo.':''} Kya ye zaroori hai?`;n--;return}
+      clearInterval(tmr);
+      box.textContent='Ab soch lo. Agar save karna hai to niche dabao.';
+      $('#sok').style.display='inline-block';$('#sg').disabled=false;
+    };
+    tick();tmr=setInterval(tick,1000);
+  };
+  $('#sok').onclick=()=>{
+    const amt=+$('#sa').value;
+    if(!(amt>0)){$('#sst').className='st er';$('#sst').textContent='Raqam daalo';return}
+    S.items.push({id:Date.now(),d:$('#sd').value||today(),amt:amt,to:$('#sw').value.trim(),c:$('#sc').value,n:$('#sn').value.trim()});
+    ls.s('fa_spend',S);sp();
+  };
+  $('#scsv').onclick=()=>{
+    const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+    const rows=[['Tareekh','Raqam','Kisko','Category','Note'].join(',')].concat(S.items.map(x=>[x.d,x.amt,x.to,x.c,x.n].map(q).join(',')));
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download='spending.csv';a.click();
   };
 }
 
